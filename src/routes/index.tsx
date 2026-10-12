@@ -1,12 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowRight, ClipboardList, FileDown, MessageCircle, ShieldCheck, Truck } from "lucide-react";
+import { ArrowRight, ClipboardList, FileDown, ShieldCheck, Truck } from "lucide-react";
 import hero from "@/assets/hero.jpg";
 import { PageShell } from "@/components/site/PageShell";
 import { ProductCard } from "@/components/site/ProductCard";
 import { Button } from "@/components/ui/button";
-import { categoriesQuery, productsQuery, settingsQuery } from "@/lib/store";
-import { whatsappUrl } from "@/lib/quote-output";
+import { categoriesQuery, productsQuery } from "@/lib/store";
+import { WhatsAppContact } from "@/components/site/WhatsAppContact";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -19,23 +19,6 @@ export const Route = createFileRoute("/")({
   }),
   component: Index,
 });
-
-export function WhatsAppContact({ className = "" }: { className?: string }) {
-  const { data } = useQuery(settingsQuery);
-  if (!data?.whatsapp)
-    return (
-      <Button variant="whatsapp" size="lg" disabled className={className} title="Número ainda não configurado pela loja">
-        <MessageCircle /> WhatsApp
-      </Button>
-    );
-  return (
-    <Button asChild variant="whatsapp" size="lg" className={className}>
-      <a href={whatsappUrl(data.whatsapp, "Olá! Vim pelo CATÁLOGO ONLINE e gostaria de atendimento.")} target="_blank" rel="noopener noreferrer">
-        <MessageCircle /> Falar no WhatsApp
-      </a>
-    </Button>
-  );
-}
 
 function Index() {
   const { data: products = [] } = useQuery(productsQuery);
