@@ -1,24 +1,121 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { ArrowRight, ClipboardList, FileDown, MessageCircle, ShieldCheck, Truck } from "lucide-react";
+import hero from "@/assets/hero.jpg";
+import { PageShell } from "@/components/site/PageShell";
+import { ProductCard } from "@/components/site/ProductCard";
+import { Button } from "@/components/ui/button";
+import { categoriesQuery, productsQuery, settingsQuery } from "@/lib/store";
+import { whatsappUrl } from "@/lib/quote-output";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "Cimentos e Ferragens | Catálogo e orçamento online" },
+      { name: "description", content: "Cimentos, vergalhões, arames, pregos e treliças. Monte seu orçamento online e envie pelo WhatsApp." },
+      { property: "og:title", content: "Cimentos e Ferragens | Catálogo e orçamento online" },
+      { property: "og:description", content: "Monte seu orçamento de cimentos e ferragens online, baixe em PDF e envie pelo WhatsApp." },
+    ],
+  }),
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
+export function WhatsAppContact({ className = "" }: { className?: string }) {
+  const { data } = useQuery(settingsQuery);
+  if (!data?.whatsapp)
+    return (
+      <Button variant="whatsapp" size="lg" disabled className={className} title="Número ainda não configurado pela loja">
+        <MessageCircle /> WhatsApp
+      </Button>
+    );
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
+    <Button asChild variant="whatsapp" size="lg" className={className}>
+      <a href={whatsappUrl(data.whatsapp, "Olá! Vim pelo CATÁLOGO ONLINE e gostaria de atendimento.")} target="_blank" rel="noopener noreferrer">
+        <MessageCircle /> Falar no WhatsApp
+      </a>
+    </Button>
+  );
+}
+
+function Index() {
+  const { data: products = [] } = useQuery(productsQuery);
+  const { data: categories = [] } = useQuery(categoriesQuery);
+  const active = products.filter((p) => p.active);
+  const featured = categories
+    .filter((c) => c.active)
+    .map((c) => ({ c, items: active.filter((p) => p.category_id === c.id) }));
+
+  return (
+    <PageShell>
+      <section className="relative overflow-hidden bg-steel">
+        <img src={hero} alt="Sacos de cimento e vergalhões em depósito" width={1600} height={912} className="absolute inset-0 h-full w-full object-cover" />
+        <div className="hero-overlay absolute inset-0" />
+        <div className="relative mx-auto max-w-6xl px-4 py-20 md:py-32">
+          <p className="mb-4 inline-block rounded bg-accent px-3 py-1 text-xs font-bold uppercase tracking-widest text-accent-foreground">
+            Cimentos & Ferragens
+          </p>
+          <h1 className="max-w-2xl text-5xl font-extrabold uppercase leading-[0.95] text-steel-foreground md:text-7xl">
+            Material forte para obra <span className="text-accent">sem parar.</span>
+          </h1>
+          <p className="mt-5 max-w-xl text-lg text-steel-foreground/80">
+            Escolha os produtos, monte seu orçamento em minutos, baixe em PDF e envie direto para a loja pelo WhatsApp.
+          </p>
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <Button asChild variant="accent" size="lg">
+              <Link to="/catalogo">Ver catálogo <ArrowRight /></Link>
+            </Button>
+            <Button asChild variant="heroOutline" size="lg">
+              <Link to="/orcamento"><ClipboardList /> Montar meu orçamento</Link>
+            </Button>
+            <WhatsAppContact />
+          </div>
+        </div>
+      </section>
+
+      <section className="border-b bg-card">
+        <div className="mx-auto grid max-w-6xl gap-6 px-4 py-6 sm:grid-cols-3">
+          {[
+            { icon: ClipboardList, t: "Orçamento na hora", d: "Totais calculados automaticamente" },
+            { icon: FileDown, t: "PDF para baixar", d: "Guarde ou compartilhe seu orçamento" },
+            { icon: Truck, t: "Entrega a combinar", d: "Condições confirmadas pela loja" },
+          ].map(({ icon: I, t, d }) => (
+            <div key={t} className="flex items-center gap-3">
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded bg-primary text-primary-foreground"><I className="h-5 w-5" /></span>
+              <div><p className="font-display text-lg font-bold uppercase text-primary">{t}</p><p className="text-sm text-muted-foreground">{d}</p></div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {active.some((p) => p.is_demo) && (
+        <div className="mx-auto mt-8 max-w-6xl px-4">
+          <p className="flex items-center gap-2 rounded border border-warning-foreground/20 bg-warning px-4 py-3 text-sm text-warning-foreground">
+            <ShieldCheck className="h-4 w-4 shrink-0" />
+            Produtos marcados como “Demonstração” têm preços fictícios, apenas para teste. Não são preços comerciais.
+          </p>
+        </div>
+      )}
+
+      {featured.map(({ c, items }) => (
+        <section key={c.id} className="mx-auto max-w-6xl px-4 pt-12">
+          <div className="mb-6 flex items-end justify-between gap-4">
+            <div>
+              <div className="mb-2 h-1 w-12 bg-accent" />
+              <h2 className="text-4xl font-extrabold uppercase text-primary">{c.name}</h2>
+            </div>
+            <Link to="/catalogo" search={{ categoria: c.slug }} className="text-sm font-semibold uppercase text-accent-foreground hover:underline">
+              Ver todos →
+            </Link>
+          </div>
+          {items.length === 0 ? (
+            <p className="text-muted-foreground">Nenhum produto cadastrado nesta categoria.</p>
+          ) : (
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              {items.slice(0, 4).map((p) => <ProductCard key={p.id} product={p} />)}
+            </div>
+          )}
+        </section>
+      ))}
+    </PageShell>
   );
 }
