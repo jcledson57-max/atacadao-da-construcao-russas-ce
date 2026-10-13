@@ -109,8 +109,8 @@ function Orcamento() {
             )}
             {waOpened && (
               <p className="mt-4 flex gap-2 rounded bg-warning p-3 text-sm text-warning-foreground">
-                <Info className="h-4 w-4 shrink-0" />
-                O WhatsApp foi aberto com a mensagem pronta. <b>A mensagem só será enviada quando você tocar em “Enviar” no aplicativo.</b> Confira lá se o envio foi concluído.
+                <Info className="mt-0.5 h-4 w-4 shrink-0" />
+                <span>O WhatsApp foi aberto com a mensagem pronta. <b>A mensagem só será enviada quando você tocar em “Enviar” no aplicativo.</b> Confira lá se o envio foi concluído.</span>
               </p>
             )}
             <div className="mt-6 flex flex-wrap gap-3">
