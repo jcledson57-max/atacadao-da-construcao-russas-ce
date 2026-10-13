@@ -41,12 +41,12 @@ function AuthPage() {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     const p = schema.safeParse({ email, password });
-    if (!p.success) return toast.error(p.error.issues[0].message);
+    if (!p.success) { toast.error(p.error.issues[0]?.message ?? "Dados inválidos"); return; }
     setBusy(true);
     if (mode === "in") {
       const { error } = await supabase.auth.signInWithPassword(p.data);
       setBusy(false);
-      if (error) return toast.error("E-mail ou senha incorretos.");
+      if (error) { toast.error("E-mail ou senha incorretos."); return; }
       navigate({ to: "/admin" });
     } else {
       const { data, error } = await supabase.auth.signUp({
@@ -54,7 +54,7 @@ function AuthPage() {
         options: { emailRedirectTo: `${window.location.origin}/admin` },
       });
       setBusy(false);
-      if (error) return toast.error(error.message);
+      if (error) { toast.error(error.message); return; }
       if (data.session) navigate({ to: "/admin" });
       else toast.success("Conta criada. Confirme pelo link enviado ao seu e-mail.");
     }
