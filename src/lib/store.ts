@@ -16,14 +16,14 @@ export type Product = {
   active: boolean;
   is_demo: boolean;
   sort_order: number;
-  image?: string | null;
+  image?: string | null | undefined;
 };
 export type StoreSettings = {
   store_name: string;
   logo_url: string | null;
   whatsapp: string;
   address: string;
-  logo?: string | null;
+  logo?: string | null | undefined;
 };
 
 /** Images uploaded by the admin live in a private bucket; resolve them to signed URLs. */

@@ -40,7 +40,7 @@ function Orcamento() {
   const { data: products = [], isLoading } = useQuery(productsQuery);
   const { data: settings } = useQuery(settingsQuery);
   const [form, setForm] = useState({ name: "", phone: "", address: "" });
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [errors, setErrors] = useState<Partial<Record<"name" | "phone" | "address", string>>>({});
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState<SavedQuote | null>(null);
   const [waOpened, setWaOpened] = useState(false);
@@ -53,11 +53,11 @@ function Orcamento() {
   async function finalize() {
     const parsed = customerSchema.safeParse(form);
     if (!parsed.success) {
-      setErrors(Object.fromEntries(parsed.error.issues.map((i) => [i.path[0], i.message])));
+      setErrors(Object.fromEntries(parsed.error.issues.map((i) => [String(i.path[0]), i.message])));
       return;
     }
     setErrors({});
-    if (rows.some((r) => !(r.line.quantity > 0))) return toast.error("Revise as quantidades.");
+    if (rows.some((r) => !(r.line.quantity > 0))) { toast.error("Revise as quantidades."); return; }
     setSaving(true);
     const { data, error } = await supabase.rpc("create_quote", {
       _name: parsed.data.name,
@@ -66,7 +66,7 @@ function Orcamento() {
       _items: rows.map((r) => ({ product_id: r.p.id, quantity: r.line.quantity })),
     });
     setSaving(false);
-    if (error || !data) return toast.error(error?.message || "Não foi possível salvar o orçamento.");
+    if (error || !data) { toast.error(error?.message || "Não foi possível salvar o orçamento."); return; }
     setSaved(data as unknown as SavedQuote);
     cart.clear();
     toast.success("Orçamento registrado!");
@@ -207,7 +207,7 @@ function Orcamento() {
   );
 }
 
-function Field({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
+function Field({ label, error, children }: { label: string; error?: string | undefined; children: React.ReactNode }) {
   return (
     <div className="space-y-1">
       <Label>{label}</Label>

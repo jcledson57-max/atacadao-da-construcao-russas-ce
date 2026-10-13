@@ -118,7 +118,7 @@ const productSchema = z.object({
   is_demo: z.boolean(),
 });
 
-type Draft = { id?: string; name: string; category_id: string; description: string; unit: string; price: string; active: boolean; is_demo: boolean; image_url: string | null; image?: string | null };
+type Draft = { id?: string; name: string; category_id: string; description: string; unit: string; price: string; active: boolean; is_demo: boolean; image_url: string | null; image?: string | null | undefined };
 
 function ProductsTab() {
   const qc = useQueryClient();
@@ -138,7 +138,7 @@ function ProductsTab() {
   async function save() {
     if (!draft) return;
     const parsed = productSchema.safeParse({ ...draft, price: Number(draft.price.replace(/\./g, "").replace(",", ".")) });
-    if (!parsed.success) return toast.error(parsed.error.issues[0].message);
+    if (!parsed.success) { toast.error(parsed.error.issues[0]?.message ?? "Dados inválidos"); return; }
     setBusy(true);
     try {
       const image_url = file ? await uploadImage(file) : draft.image_url;
@@ -159,7 +159,7 @@ function ProductsTab() {
 
   async function toggle(p: Product) {
     const { error } = await supabase.from("products").update({ active: !p.active }).eq("id", p.id);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     qc.invalidateQueries({ queryKey: ["products"] });
   }
 
@@ -238,15 +238,15 @@ function CategoriesTab() {
 
   async function add() {
     const n = name.trim();
-    if (!n || n.length > 80) return toast.error("Nome inválido");
+    if (!n || n.length > 80) { toast.error("Nome inválido"); return; }
     const { error } = await supabase.from("categories").insert({ name: n, slug: slugify(n) || crypto.randomUUID().slice(0, 8), sort_order: categories.length + 1 });
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     setName("");
     refresh();
   }
   async function update(c: Category, patch: Partial<Category>) {
     const { error } = await supabase.from("categories").update(patch).eq("id", c.id);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     refresh();
   }
 
@@ -289,7 +289,7 @@ function SettingsTab() {
 
   async function save() {
     const p = settingsSchema.safeParse({ ...form, whatsapp: form.whatsapp.replace(/\D/g, "") });
-    if (!p.success) return toast.error(p.error.issues[0].message);
+    if (!p.success) { toast.error(p.error.issues[0]?.message ?? "Dados inválidos"); return; }
     setBusy(true);
     try {
       const logo_url = file ? await uploadImage(file) : (data?.logo_url ?? null);
