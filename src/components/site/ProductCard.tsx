@@ -1,4 +1,4 @@
-import { Check, ImageOff, Plus } from "lucide-react";
+import { Check, ImageOff, Minus, Plus } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import type { Product } from "@/lib/store";
@@ -15,10 +15,12 @@ export function DemoBadge() {
 }
 
 export function ProductCard({ product }: { product: Product }) {
-  const { add } = useCart();
+  const { add, lines, setQty, remove } = useCart();
   const [added, setAdded] = useState(false);
+  const qty = lines.find((l) => l.product_id === product.id)?.quantity ?? 0;
+  const inCart = qty > 0;
   return (
-    <article className="group flex flex-col overflow-hidden rounded-lg border bg-card shadow-card">
+    <article className={`group flex flex-col overflow-hidden rounded-lg border bg-card shadow-card transition-colors ${inCart ? "border-accent ring-2 ring-accent/40" : ""}`}>
       <div className="relative aspect-square bg-muted">
         {product.image ? (
           <img src={product.image} alt={product.name} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
@@ -26,19 +28,39 @@ export function ProductCard({ product }: { product: Product }) {
           <div className="flex h-full items-center justify-center text-muted-foreground"><ImageOff /></div>
         )}
         {product.is_demo && <div className="absolute left-2 top-2"><DemoBadge /></div>}
+        {inCart && (
+          <div className="absolute right-2 top-2 rounded-full bg-accent px-3 py-1 text-xs font-bold text-accent-foreground shadow">
+            {qty} no orçamento
+          </div>
+        )}
       </div>
       <div className="flex flex-1 flex-col gap-1 p-4">
         <h3 className="text-lg font-bold leading-tight text-primary">{product.name}</h3>
         <p className="line-clamp-2 text-sm text-muted-foreground">{product.description}</p>
-        <div className="mt-auto flex items-end justify-between pt-3">
-          <div>
-            <p className="font-display text-2xl font-bold text-foreground">{formatBRL(product.price)}</p>
-            <p className="text-xs uppercase tracking-wide text-muted-foreground">por {product.unit}</p>
-          </div>
+        <div className="mt-auto pt-3">
+          <p className="font-display text-2xl font-bold text-foreground">{formatBRL(product.price)}</p>
+          <p className="text-xs uppercase tracking-wide text-muted-foreground">por {product.unit}</p>
+        </div>
+        <div className="mt-3 flex items-center gap-2">
+          {inCart && (
+            <div className="flex h-10 items-center overflow-hidden rounded-md border-2 border-accent" aria-label={`Quantidade no orçamento: ${qty}`}>
+              <button
+                type="button"
+                className="flex h-full w-9 items-center justify-center text-primary hover:bg-muted"
+                aria-label="Diminuir quantidade"
+                onClick={() => (qty <= 1 ? remove(product.id) : setQty(product.id, qty - 1))}
+              >
+                <Minus className="h-4 w-4" />
+              </button>
+              <span className="min-w-9 px-1 text-center font-display text-lg font-bold text-primary" aria-live="polite">
+                {qty}
+              </span>
+            </div>
+          )}
           <Button
             variant="accent"
             size="sm"
-            className="h-10"
+            className="h-10 flex-1"
             onClick={() => {
               add(product.id);
               setAdded(true);
