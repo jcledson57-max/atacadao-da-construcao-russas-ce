@@ -7,6 +7,7 @@ import { ProductCard } from "@/components/site/ProductCard";
 import { Button } from "@/components/ui/button";
 import { categoriesQuery, productsQuery } from "@/lib/store";
 import { WhatsAppContact } from "@/components/site/WhatsAppContact";
+import { CartTotalBar } from "@/components/site/CartTotalBar";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -99,6 +100,8 @@ function Index() {
           )}
         </section>
       ))}
+      <div className="h-28" aria-hidden />
+      <CartTotalBar />
     </PageShell>
   );
 }
