@@ -44,7 +44,7 @@ function Catalogo() {
           <p className="mt-2 text-steel-foreground/70">Adicione os produtos ao seu orçamento. Preços por unidade de venda.</p>
         </div>
       </section>
-      <div className="mx-auto max-w-6xl px-4 py-8">
+      <div className="mx-auto max-w-6xl px-4 py-8 pb-28">
         <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="flex flex-wrap gap-2">
             <Link to="/catalogo" search={{}} className={`rounded px-4 py-2 text-sm font-semibold uppercase ${!current ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"}`}>Todos</Link>
