@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Search } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
+import { CartTotalBar } from "@/components/site/CartTotalBar";
 import { PageShell } from "@/components/site/PageShell";
 import { ProductCard } from "@/components/site/ProductCard";
 import { Input } from "@/components/ui/input";
@@ -68,6 +69,7 @@ function Catalogo() {
           </div>
         )}
       </div>
+      <CartTotalBar />
     </PageShell>
   );
 }
