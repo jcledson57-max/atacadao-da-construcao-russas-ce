@@ -2,7 +2,8 @@ import { Link } from "@tanstack/react-router";
 import { ClipboardList, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { Brand } from "./Brand";
-import { useCart } from "@/lib/cart";
+import { formatBRL } from "@/lib/format";
+import { useCartTotal } from "@/lib/useCartTotal";
 import { Button } from "@/components/ui/button";
 
 const links = [
@@ -12,7 +13,7 @@ const links = [
 ] as const;
 
 export function SiteHeader() {
-  const { count } = useCart();
+  const { count, total } = useCartTotal();
   const [open, setOpen] = useState(false);
   return (
     <header className="sticky top-0 z-40 border-b bg-card/95 backdrop-blur">
@@ -33,9 +34,9 @@ export function SiteHeader() {
         </nav>
         <div className="flex items-center gap-2">
           <Button asChild variant="accent" size="sm" className="h-10">
-            <Link to="/orcamento" aria-label="Meu orçamento">
+            <Link to="/orcamento" aria-label={`Meu orçamento, total ${formatBRL(total)}`}>
               <ClipboardList />
-              <span className="hidden sm:inline">Orçamento</span>
+              <span className="hidden sm:inline">{count > 0 ? formatBRL(total) : "Orçamento"}</span>
               <span className="rounded-full bg-steel px-2 py-0.5 text-xs text-steel-foreground">{count}</span>
             </Link>
           </Button>
