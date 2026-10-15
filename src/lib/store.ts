@@ -39,7 +39,16 @@ export async function resolveImages(paths: (string | null)[]): Promise<(string |
       );
     data?.forEach((d) => d.path && d.signedUrl && map.set(STORAGE_PREFIX + d.path, d.signedUrl));
   }
-  return paths.map((p) => (!p ? null : p.startsWith(STORAGE_PREFIX) ? (map.get(p) ?? null) : p));
+  return paths.map((p) =>
+    !p ? null : p.startsWith(STORAGE_PREFIX) ? (map.get(p) ?? null) : withBase(p),
+  );
+}
+
+/** Prefix site-relative paths (e.g. "/images/x.jpg") with the deploy base path (GitHub Pages subfolder). */
+export function withBase(p: string): string {
+  if (!p.startsWith("/") || p.startsWith("//")) return p;
+  const base = (import.meta.env.BASE_URL || "/").replace(/\/$/, "");
+  return base && !p.startsWith(base + "/") ? base + p : p;
 }
 
 async function withImages(rows: Product[]): Promise<Product[]> {

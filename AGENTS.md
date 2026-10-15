@@ -14,3 +14,5 @@
 - Admin access = row in `user_roles` with role `admin`; the first signed-up user is auto-promoted by trigger. All writes are guarded by RLS with `has_role`.
 - Store images live in the private `store-images` bucket (public buckets are blocked); DB stores `storage:<path>` and the client resolves signed URLs in `src/lib/store.ts`.
 - PDF generation is client-side (jspdf + jspdf-autotable) in `src/lib/quote-output.ts`, so it works on any device without server runtime constraints.
+- GitHub Pages build is opt-in via `GITHUB_PAGES=true` (static SPA, base from `PAGES_BASE`, output `dist/client`); default build stays the Lovable/Cloudflare one so preview and publish are unaffected.
+- Site-relative image paths go through `withBase()` in `src/lib/store.ts` so they work under a subfolder base path.
