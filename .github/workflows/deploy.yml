@@ -1,3 +1,4 @@
+
 name: Deploy to GitHub Pages
 
 on:
@@ -19,22 +20,29 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Configure GitHub Pages
-      uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v5
+
       - uses: oven-sh/setup-bun@v2
+
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+
       - run: bun install
+
       - name: Build static site
         run: bun run build
         env:
           GITHUB_PAGES: "true"
           PAGES_BASE: /${{ github.event.repository.name }}/
+
       - name: SPA fallback for deep links
         run: |
           cp dist/client/index.html dist/client/404.html
           touch dist/client/.nojekyll
+
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist/client
