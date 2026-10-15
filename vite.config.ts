@@ -8,8 +8,8 @@ import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
 // GitHub Pages build: static SPA served from a subfolder. Enabled only when GITHUB_PAGES=true
 // (set in .github/workflows/deploy.yml), so the Lovable preview/publish keep working unchanged.
-const isPages = process.env.GITHUB_PAGES === "true";
-const pagesBase = process.env.PAGES_BASE || "/atacadao-da-construcao-russas-ce/";
+const isPages = process.env["GITHUB_PAGES"] === "true";
+const pagesBase = process.env["PAGES_BASE"] || "/atacadao-da-construcao-russas-ce/";
 
 export default defineConfig(
   isPages
