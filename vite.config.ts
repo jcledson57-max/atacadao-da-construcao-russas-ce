@@ -18,7 +18,6 @@ export default defineConfig(
         nitro: false,
         tanstackStart: {
           server: { entry: "server" },
-          router: { basepath: pagesBase },
           spa: { enabled: true, prerender: { outputPath: "/index.html" } },
         },
       }
