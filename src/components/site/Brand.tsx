@@ -9,7 +9,7 @@ export function Brand({ light = false }: { light?: boolean }) {
   return (
     <Link to="/" className="flex items-center gap-2.5">
       {data?.logo ? (
-        <img src={data.logo} alt={name} className="h-16 w-16 rounded object-contain" />
+        <img src={data.logo} alt={name} className="h-20 w-20 rounded object-contain" />
       ) : (
         <span className="flex h-10 w-10 items-center justify-center rounded bg-accent text-accent-foreground">
           <HardHat className="h-6 w-6" />
