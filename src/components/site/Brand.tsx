@@ -1,27 +1,38 @@
+
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { HardHat } from "lucide-react";
 import { settingsQuery } from "@/lib/store";
+import logoAtacadao from "@/ativos/atacadaologo.jpeg";
 
 export function Brand({ light = false }: { light?: boolean }) {
   const { data } = useQuery(settingsQuery);
-  const name = data?.store_name?.trim() || "Sua Loja";
+  const name = data?.store_name?.trim() || "Atacadão da Construção";
+
   return (
     <Link to="/" className="flex items-center gap-2.5">
-      {data?.logo ? (
-        <img src={data.logo} alt={name} className="h-20 w-20 rounded object-contain" />
-      ) : (
-        <span className="flex h-10 w-10 items-center justify-center rounded bg-accent text-accent-foreground">
-          <HardHat className="h-6 w-6" />
-        </span>
-      )}
+      <img
+        src={logoAtacadao}
+        alt={name}
+        className="h-20 w-20 rounded object-contain"
+      />
+
       <span className="leading-tight">
         <span
-          className={`block font-display text-xl font-bold uppercase ${light ? "text-steel-foreground" : "text-primary"}`}
+          className={`block font-display text-xl font-bold uppercase ${
+            light ? "text-steel-foreground" : "text-primary"
+          }`}
         >
           {name}
         </span>
-        <span className={`block text-xs ${light ? "text-steel-foreground/70" : "text-muted-foreground"}`}>
+
+        <span
+          className={`block text-xs ${
+            light
+              ? "text-steel-foreground/70"
+              : "text-muted-foreground"
+          }`}
+        >
           Cimentos & Ferragens
         </span>
       </span>
