@@ -37,7 +37,7 @@ function Index() {
         alt="Sacos de cimento e vergalhões em depósito"
         width={1600}
         height={912}
-        className="absolute inset-0 h-full w-full object-cover object-center md:object-center"
+        className="absolute inset-0 h-full w-full object-cover object-[65%_center] md:object-center"
       />
       <div className="hero-overlay absolute inset-0" />
       <div className="relative mx-auto max-w-6xl px-4 py-12 sm:py-20 md:py-32">
