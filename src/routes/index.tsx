@@ -44,7 +44,7 @@ function Index() {
         <p className="mb-4 inline-block rounded bg-accent px-3 py-1 text-xs font-bold uppercase tracking-widest text-accent-foreground">
           Cimentos & Ferragens
         </p>
-          <h1 className="max-w-2xl text-5xl font-extrabold uppercase leading-[0.95] text-steel-foreground md:text-7xl">
+          <h1 className="max-w-2xl text-4xl font-extrabold uppercase leading-tight text-steel-foreground sm:text-5xl md:text-7xl">
             Qualidade para construir. <span className="text-accent">Economia para realizar.</span>
           </h1>
           <p className="mt-5 max-w-xl text-lg text-steel-foreground/80">
