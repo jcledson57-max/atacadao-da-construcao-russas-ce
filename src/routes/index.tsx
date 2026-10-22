@@ -30,14 +30,20 @@ function Index() {
     .map((c) => ({ c, items: active.filter((p) => p.category_id === c.id) }));
 
   return (
-    <PageShell>
-      <section className="relative overflow-hidden bg-steel">
-        <img src={hero} alt="Sacos de cimento e vergalhões em depósito" width={1600} height={912} className="absolute inset-0 h-full w-full object-cover" />
-        <div className="hero-overlay absolute inset-0" />
-        <div className="relative mx-auto max-w-6xl px-4 py-20 md:py-32">
-          <p className="mb-4 inline-block rounded bg-accent px-3 py-1 text-xs font-bold uppercase tracking-widest text-accent-foreground">
-            Cimentos & Ferragens
-          </p>
+  <PageShell>
+    <section className="relative overflow-hidden bg-steel">
+      <img
+        src={hero}
+        alt="Sacos de cimento e vergalhões em depósito"
+        width={1600}
+        height={912}
+        className="absolute inset-0 h-full w-full object-cover object-center md:object-center"
+      />
+      <div className="hero-overlay absolute inset-0" />
+      <div className="relative mx-auto max-w-6xl px-4 py-14 sm:py-20 md:py-32">
+        <p className="mb-4 inline-block rounded bg-accent px-3 py-1 text-xs font-bold uppercase tracking-widest text-accent-foreground">
+          Cimentos & Ferragens
+        </p>
           <h1 className="max-w-2xl text-5xl font-extrabold uppercase leading-[0.95] text-steel-foreground md:text-7xl">
             Qualidade para construir. <span className="text-accent">Economia para realizar.</span>
           </h1>
