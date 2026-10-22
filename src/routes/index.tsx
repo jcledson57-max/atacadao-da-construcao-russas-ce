@@ -39,7 +39,7 @@ function Index() {
             Cimentos & Ferragens
           </p>
           <h1 className="max-w-2xl text-5xl font-extrabold uppercase leading-[0.95] text-steel-foreground md:text-7xl">
-            Material forte para obra <span className="text-accent">sem parar.</span>
+            Qualidade para construir. <span className="text-accent">Economia para realizar.</span>
           </h1>
           <p className="mt-5 max-w-xl text-lg text-steel-foreground/80">
             Escolha os produtos, monte seu orçamento em minutos, baixe em PDF e envie direto para a loja pelo WhatsApp.
