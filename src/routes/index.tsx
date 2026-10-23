@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, ClipboardList, FileDown, ShieldCheck, Truck } from "lucide-react";
-import hero from "@/ativos/oficialbanner.jpeg.jpg";
+import hero from "@/ativos/oficial2.jpeg.jpg";
 import { PageShell } from "@/components/site/PageShell";
 import { ProductCard } from "@/components/site/ProductCard";
 import { Button } from "@/components/ui/button";
