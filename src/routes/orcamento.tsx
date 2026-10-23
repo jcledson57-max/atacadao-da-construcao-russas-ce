@@ -154,7 +154,7 @@ function Orcamento() {
                         {p.is_demo && <DemoBadge />}
                       </div>
                     </div>
-                    <div className="flex items-center justify-between gap-3 sm:justify-end">
+                    <div className="flex min-w-0 flex-wrap items-center justify-between gap-2 sm:flex-nowrap sm:justify-end">
                       <div className="flex items-center">
                         <Button variant="outline" size="icon" aria-label="Diminuir" onClick={() => cart.setQty(p.id, Math.max(1, round2(line.quantity - 1)))}><Minus /></Button>
                         <Input
