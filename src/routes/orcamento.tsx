@@ -130,7 +130,7 @@ function Orcamento() {
           <p className="mt-2 text-steel-foreground/70">Ajuste as quantidades e informe seus dados para finalizar.</p>
         </div>
       </section>
-      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-8 lg:grid-cols-[1fr_380px]">
+      <div className="mx-auto grid w-full min-w-0 max-w-6xl gap-6 px-3 py-6 sm:px-4 sm:py-8 lg:grid-cols-[minmax(0,1fr)_380px]">
         <div>
           <Button asChild variant="ghost" className="mb-4 -ml-3"><Link to="/catalogo"><ArrowLeft /> Continuar escolhendo produtos</Link></Button>
           {isLoading ? (
