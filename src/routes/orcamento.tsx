@@ -145,7 +145,7 @@ function Orcamento() {
               {rows.map(({ line, p }) => {
                 const sub = round2(p.price * line.quantity);
                 return (
-                  <li key={p.id} className="flex flex-col gap-3 rounded-lg border bg-card p-4 shadow-card sm:flex-row sm:items-center">
+                  <li key={p.id} className="flex min-w-0 flex-col gap-3 rounded-lg border bg-card p-3 shadow-card sm:p-4 sm:flex-row sm:items-center">
                     <div className="flex flex-1 items-center gap-3">
                       {p.image && <img src={p.image} alt="" className="h-16 w-16 rounded object-cover" />}
                       <div>
