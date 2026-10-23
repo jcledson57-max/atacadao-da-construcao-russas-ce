@@ -23,7 +23,7 @@ export function Brand({ light = false }: { light?: boolean }) {
           {name}
         </span>
         <span className={`block text-xs ${light ? "text-steel-foreground/70" : "text-muted-foreground"}`}>
-          Cimentos & Ferragens
+          
         </span>
       </span>
     </Link>
