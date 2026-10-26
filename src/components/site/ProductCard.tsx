@@ -29,9 +29,8 @@ export function ProductCard({ product }: { product: Product }) {
         )}
         {product.is_demo && <div className="absolute left-2 top-2"><DemoBadge /></div>}
         {inCart && (
-          <div className="absolute right-2 top-2 rounded-full bg-accent px-3 py-1 text-xs font-bold text-accent-foreground shadow">
-            {qty} no orçamento
-          </div>
+           {product.is_demo && <div className="absolute left-2 top-2"><DemoBadge /></div>}
+      </div>
         )}
       </div>
       <div className="flex flex-1 flex-col gap-1 p-4">
