@@ -12,7 +12,7 @@ export function CartTotalBar() {
     <div className="fixed inset-x-0 bottom-0 z-40 border-t bg-card/95 shadow-[0_-4px_16px_rgba(0,0,0,0.12)] backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
         <div className="min-w-0">
-          <p className="truncate text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground leading-tight">
             {count} {count === 1 ? "item no orçamento" : "itens no orçamento"}
           </p>
           <p className="font-display text-2xl font-bold leading-tight text-primary" aria-live="polite">
