@@ -1,4 +1,3 @@
-```tsx
 import { Link } from "@tanstack/react-router";
 import { ClipboardList } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -32,4 +31,4 @@ export function CartTotalBar() {
     </div>
   );
 }
-```
+
