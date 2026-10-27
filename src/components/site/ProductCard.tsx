@@ -69,7 +69,7 @@ export function ProductCard({ product }: { product: Product }) {
         <div className="mt-3 flex w-full min-w-0 items-center gap-1">
           {inCart && (
             <div
-              className="flex h-10 shrink-0 items-center overflow-hidden rounded-md border-2 border-accent"
+              className="flex h-10 shrink-0 items-center justify-center overflow-hidden rounded-md border-2 border-accent"
               aria-label={`Quantidade no orçamento: ${qty}`}
             >
               <button
@@ -86,7 +86,7 @@ export function ProductCard({ product }: { product: Product }) {
               </button>
 
               <span
-                className="w-6 shrink-0 text-center font-display text-base font-bold text-primary"
+                className="flex w-6 shrink-0 items-center justify-center text-center font-display text-base font-bold text-primary"
                 aria-live="polite"
               >
                 {qty}
@@ -97,7 +97,7 @@ export function ProductCard({ product }: { product: Product }) {
           <Button
             variant="accent"
             size="sm"
-            className="h-10 min-w-0 flex-1 gap-1 whitespace-nowrap px-2 text-sm [&_svg]:h-4 [&_svg]:w-4 [&_svg]:shrink-0"
+            className="h-10 min-w-0 flex-1 justify-center gap-1 whitespace-nowrap px-1 text-xs sm:px-2 sm:text-sm [&_svg]:h-4 [&_svg]:w-4 [&_svg]:shrink-0"
             onClick={() => {
               add(product.id);
               setAdded(true);
