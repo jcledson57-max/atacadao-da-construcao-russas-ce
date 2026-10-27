@@ -23,7 +23,7 @@ export function ProductCard({ product }: { product: Product }) {
 
   return (
     <article
-      className={`group flex flex-col overflow-hidden rounded-lg border bg-card shadow-card transition-colors ${
+      className={`group flex min-w-0 flex-col overflow-hidden rounded-lg border bg-card shadow-card transition-colors ${
         inCart ? "border-accent ring-2 ring-accent/40" : ""
       }`}
     >
@@ -48,7 +48,7 @@ export function ProductCard({ product }: { product: Product }) {
         )}
       </div>
 
-      <div className="flex flex-1 flex-col gap-1 p-4">
+      <div className="flex min-w-0 flex-1 flex-col gap-1 p-3 sm:p-4">
         <h3 className="text-lg font-bold leading-tight text-primary">
           {product.name}
         </h3>
@@ -66,7 +66,7 @@ export function ProductCard({ product }: { product: Product }) {
           </p>
         </div>
 
-        <div className="mt-3 flex items-center gap-1.5">
+        <div className="mt-3 flex w-full min-w-0 items-center gap-1">
           {inCart && (
             <div
               className="flex h-10 shrink-0 items-center overflow-hidden rounded-md border-2 border-accent"
@@ -86,27 +86,18 @@ export function ProductCard({ product }: { product: Product }) {
               </button>
 
               <span
-                className="w-7 shrink-0 text-center font-display text-base font-bold text-primary"
+                className="w-6 shrink-0 text-center font-display text-base font-bold text-primary"
                 aria-live="polite"
               >
                 {qty}
               </span>
-
-                            <button
-                type="button"
-                className="flex h-full w-7 shrink-0 items-center justify-center text-primary hover:bg-muted"
-                aria-label="Aumentar quantidade"
-                onClick={() => setQty(product.id, qty + 1)}
-              >
-                <Plus className="h-4 w-4" />
-              </button>
             </div>
           )}
 
           <Button
             variant="accent"
             size="sm"
-            className="h-10 min-w-0 flex-1 whitespace-nowrap px-1.5 text-sm"
+            className="h-10 min-w-0 flex-1 gap-1 whitespace-nowrap px-2 text-sm [&_svg]:h-4 [&_svg]:w-4 [&_svg]:shrink-0"
             onClick={() => {
               add(product.id);
               setAdded(true);
@@ -114,7 +105,8 @@ export function ProductCard({ product }: { product: Product }) {
               setTimeout(() => setAdded(false), 1200);
             }}
           >
-            {added ? <Check /> : <Plus />} Adicionar
+            {added ? <Check /> : <Plus />}
+            <span>Adicionar</span>
           </Button>
         </div>
       </div>
