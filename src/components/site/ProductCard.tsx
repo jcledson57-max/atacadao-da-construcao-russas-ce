@@ -22,7 +22,11 @@ export function ProductCard({ product }: { product: Product }) {
   const inCart = qty > 0;
 
   return (
-    <article className={`group flex flex-col overflow-hidden rounded-lg border bg-card shadow-card transition-colors ${inCart ? "border-accent ring-2 ring-accent/40" : ""}`}>
+    <article
+      className={`group flex flex-col overflow-hidden rounded-lg border bg-card shadow-card transition-colors ${
+        inCart ? "border-accent ring-2 ring-accent/40" : ""
+      }`}
+    >
       <div className="relative aspect-square bg-muted">
         {product.image ? (
           <img
@@ -36,6 +40,7 @@ export function ProductCard({ product }: { product: Product }) {
             <ImageOff />
           </div>
         )}
+
         {product.is_demo && (
           <div className="absolute left-2 top-2">
             <DemoBadge />
@@ -47,6 +52,7 @@ export function ProductCard({ product }: { product: Product }) {
         <h3 className="text-lg font-bold leading-tight text-primary">
           {product.name}
         </h3>
+
         <p className="line-clamp-2 text-sm text-muted-foreground">
           {product.description}
         </p>
@@ -60,7 +66,7 @@ export function ProductCard({ product }: { product: Product }) {
           </p>
         </div>
 
-        <div className="mt-3 flex items-center gap-2">
+        <div className="mt-3 flex items-center gap-1.5">
           {inCart && (
             <div
               className="flex h-10 shrink-0 items-center overflow-hidden rounded-md border-2 border-accent"
@@ -68,7 +74,7 @@ export function ProductCard({ product }: { product: Product }) {
             >
               <button
                 type="button"
-                className="flex h-full w-8 items-center justify-center text-primary hover:bg-muted"
+                className="flex h-full w-7 shrink-0 items-center justify-center text-primary hover:bg-muted"
                 aria-label="Diminuir quantidade"
                 onClick={() =>
                   qty <= 1
@@ -78,19 +84,29 @@ export function ProductCard({ product }: { product: Product }) {
               >
                 <Minus className="h-4 w-4" />
               </button>
+
               <span
-                className="min-w-8 px-1 text-center font-display text-lg font-bold text-primary"
+                className="w-7 shrink-0 text-center font-display text-base font-bold text-primary"
                 aria-live="polite"
               >
                 {qty}
               </span>
+
+              <button
+                type="button"
+                className="flex h-full w-7 shrink-0 items-center justify-center text-primary hover:bg-muted"
+                aria-label="Aumentar quantidade"
+                onClick={() => setQty(product.id, qty + 1)}
+              >
+                <Plus className="h-4 w-4" />
+              </button>
             </div>
           )}
 
           <Button
             variant="accent"
             size="sm"
-            className="h-10 min-w-0 flex-1 px-2 text-sm"
+            className="h-10 min-w-0 flex-1 whitespace-nowrap px-1.5 text-sm"
             onClick={() => {
               add(product.id);
               setAdded(true);
