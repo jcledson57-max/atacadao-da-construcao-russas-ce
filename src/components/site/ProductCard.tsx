@@ -92,7 +92,7 @@ export function ProductCard({ product }: { product: Product }) {
                 {qty}
               </span>
 
-              <button
+                            <button
                 type="button"
                 className="flex h-full w-7 shrink-0 items-center justify-center text-primary hover:bg-muted"
                 aria-label="Aumentar quantidade"
