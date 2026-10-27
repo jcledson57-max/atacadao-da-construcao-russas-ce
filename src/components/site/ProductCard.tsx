@@ -68,7 +68,7 @@ export function ProductCard({ product }: { product: Product }) {
             >
               <button
                 type="button"
-                className="flex h-full w-10 items-center justify-center text-primary hover:bg-muted"
+                className="flex h-full w-8 items-center justify-center text-primary hover:bg-muted"
                 aria-label="Diminuir quantidade"
                 onClick={() =>
                   qty <= 1
