@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, ClipboardList, FileDown, ShieldCheck, Truck } from "lucide-react";
-import hero from "@/ativos/logo.4.png";
+import hero from "@/ativos/novobanner.jpeg.jpeg";
 import { PageShell } from "@/components/site/PageShell";
 import { ProductCard } from "@/components/site/ProductCard";
 import { Button } from "@/components/ui/button";
@@ -37,7 +37,7 @@ function Index() {
         alt="Sacos de cimento e vergalhões em depósito"
         width={1600}
         height={912}
-        className="absolute inset-0 h-full w-full object-cover object-[60%_center] sm:object-[65%_center] md:object-center"
+        className="absolute inset-0 h-full w-full object-contain sm:object-cover sm:object-[65%_center] md:object-center"
       />
       <div className="hero-overlay absolute inset-0" />
       <div className="relative mx-auto max-w-6xl px-4 py-12 sm:py-20 md:py-32">
