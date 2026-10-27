@@ -79,7 +79,7 @@ export function ProductCard({ product }: { product: Product }) {
                 <Minus className="h-4 w-4" />
               </button>
               <span
-                className="min-w-12 px-2 text-center font-display text-lg font-bold text-primary"
+                className="min-w-8 px-1 text-center font-display text-lg font-bold text-primary"
                 aria-live="polite"
               >
                 {qty}
