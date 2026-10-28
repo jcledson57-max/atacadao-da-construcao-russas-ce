@@ -36,7 +36,7 @@ jobs:
         run: bun run build
         env:
           GITHUB_PAGES: "true"
-          PAGES_BASE: /${{ github.event.repository.name }}/
+          PAGES_BASE: /
 
       - name: SPA fallback for deep links
         run: |
