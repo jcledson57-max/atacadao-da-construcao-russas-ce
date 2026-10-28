@@ -12,7 +12,7 @@ import { CartTotalBar } from "@/components/site/CartTotalBar";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Cimentos e Ferragens | Catálogo e orçamento online" },
+      { title: "Atacadão da Construção" },
       { name: "description", content: "Cimentos, vergalhões, arames, pregos e treliças. Monte seu orçamento online e envie pelo WhatsApp." },
       { property: "og:title", content: "Cimentos e Ferragens | Catálogo e orçamento online" },
       { property: "og:description", content: "Monte seu orçamento de cimentos e ferragens online, baixe em PDF e envie pelo WhatsApp." },
