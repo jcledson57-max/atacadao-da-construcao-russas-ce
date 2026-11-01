@@ -26,7 +26,7 @@ import {
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
     meta: [
-      { title: "Painel administrativo | Atacadão da Construção" },
+      { title: "Painel administrativo" },
       { name: "description", content: "Gestão de produtos, configurações e orçamentos." },
       { property: "og:title", content: "Painel administrativo" },
       { property: "og:description", content: "Gestão de produtos, configurações e orçamentos." },

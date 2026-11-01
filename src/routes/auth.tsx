@@ -12,7 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Acesso administrativo | Atacadão da Construção" },
+      { title: "Acesso administrativo" },
       { name: "description", content: "Entrada da área administrativa da loja." },
       { property: "og:title", content: "Acesso administrativo" },
       { property: "og:description", content: "Entrada da área administrativa da loja." },
