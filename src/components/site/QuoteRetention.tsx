@@ -78,7 +78,7 @@ export function QuoteRetention() {
         _days: review.days, _cutoff: review.cutoff, _expected_count: review.count, _confirmed: true,
       });
       if (error) throw error;
-      const removed = typeof data === "object" && data !== null && "deleted_count" in data ? Number(data.deleted_count) : review.count;
+      const removed = typeof data === "object" && data !== null && "deleted_count" in data ? Number(data["deleted_count"]) : review.count;
       toast.success(`${removed} orçamentos removidos. Operação registrada no histórico.`);
       setReview(null);
       setConfirmed(false);
