@@ -94,6 +94,36 @@ export type Database = {
           },
         ]
       }
+      quote_cleanup_history: {
+        Row: {
+          admin_email: string
+          admin_user_id: string
+          created_at: string
+          cutoff_at: string
+          deleted_count: number
+          id: string
+          retention_days: number
+        }
+        Insert: {
+          admin_email: string
+          admin_user_id: string
+          created_at?: string
+          cutoff_at: string
+          deleted_count: number
+          id?: string
+          retention_days: number
+        }
+        Update: {
+          admin_email?: string
+          admin_user_id?: string
+          created_at?: string
+          cutoff_at?: string
+          deleted_count?: number
+          id?: string
+          retention_days?: number
+        }
+        Relationships: []
+      }
       quote_items: {
         Row: {
           id: string
@@ -222,12 +252,39 @@ export type Database = {
         Args: { _address: string; _items: Json; _name: string; _phone: string }
         Returns: Json
       }
+      delete_old_quotes: {
+        Args: {
+          _confirmed: boolean
+          _cutoff: string
+          _days: number
+          _expected_count: number
+        }
+        Returns: Json
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
         Returns: boolean
+      }
+      quote_cleanup_history_recent: {
+        Args: never
+        Returns: {
+          admin_email: string
+          admin_user_id: string
+          created_at: string
+          cutoff_at: string
+          deleted_count: number
+          id: string
+          retention_days: number
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "quote_cleanup_history"
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
     }
     Enums: {
