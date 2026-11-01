@@ -13,7 +13,7 @@ export const Route = createFileRoute("/catalogo")({
   validateSearch: z.object({ categoria: z.string().optional() }),
   head: () => ({
     meta: [
-      { title: "Catálogo de cimentos e ferragens | Atacadão da Construção" },
+      { title: "Catálogo de cimentos e ferragens" },
       { name: "description", content: "Veja cimentos, vergalhões, arames, pregos, treliças e mais. Adicione ao orçamento online." },
       { property: "og:title", content: "Catálogo de cimentos e ferragens" },
       { property: "og:description", content: "Produtos para construção com preço por unidade de venda e orçamento online." },
