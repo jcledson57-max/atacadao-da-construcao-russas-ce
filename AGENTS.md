@@ -16,4 +16,4 @@
 - PDF generation is client-side (jspdf + jspdf-autotable) in `src/lib/quote-output.ts`, so it works on any device without server runtime constraints.
 - GitHub Pages build is opt-in via `GITHUB_PAGES=true` (static SPA, base from `PAGES_BASE`, output `dist/client`); default build stays the Lovable/Cloudflare one so preview and publish are unaffected.
 - Site-relative image paths go through `withBase()` in `src/lib/store.ts` so they work under a subfolder base path.
-- Quote retention uses authenticated, RLS-protected exact HEAD counts independent of the list limit; the retention component has no mutation path so reviewing old quotes cannot delete records.
+- Quote retention uses RLS-protected exact counts and paginated CSV reads; cleanup runs only through the admin-validated delete_old_quotes RPC, which checks the confirmed count and records audit history in the same transaction as cascading deletion.

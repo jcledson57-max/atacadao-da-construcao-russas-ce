@@ -8,6 +8,13 @@
       "when": 1791820356701,
       "tag": "0000_migration",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1793535176003,
+      "tag": "0001_quote_retention_audit",
+      "breakpoints": true
     }
   ]
 }
