@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { Brand } from "@/components/site/Brand";
 import { QuoteTable } from "@/components/site/QuoteTable";
+import { QuoteRetention } from "@/components/site/QuoteRetention";
 import { DemoBadge } from "@/components/site/ProductCard";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -25,10 +26,12 @@ import {
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
     meta: [
-      { title: "Painel administrativo" },
+      { title: "Painel administrativo | Atacadão da Construção" },
       { name: "description", content: "Gestão de produtos, configurações e orçamentos." },
       { property: "og:title", content: "Painel administrativo" },
       { property: "og:description", content: "Gestão de produtos, configurações e orçamentos." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -341,6 +344,7 @@ function QuotesTab() {
 
   return (
     <div>
+      <QuoteRetention />
       <Input className="mb-4 max-w-sm" placeholder="Buscar por número, cliente ou telefone" value={q} onChange={(e) => setQ(e.target.value)} />
       {isLoading ? <Loader2 className="animate-spin" /> : list.length === 0 ? (
         <p className="text-muted-foreground">Nenhum orçamento recebido ainda.</p>

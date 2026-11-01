@@ -20,10 +20,12 @@ import { productsQuery, settingsQuery } from "@/lib/store";
 export const Route = createFileRoute("/orcamento")({
   head: () => ({
     meta: [
-      { title: "Montar orçamento | Cimentos e Ferragens" },
+      { title: "Montar orçamento | Atacadão da Construção" },
       { name: "description", content: "Monte seu orçamento, baixe em PDF e envie para a loja pelo WhatsApp." },
       { property: "og:title", content: "Montar orçamento de cimentos e ferragens" },
       { property: "og:description", content: "Calcule quantidades e totais e envie seu orçamento pelo WhatsApp." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Orcamento,

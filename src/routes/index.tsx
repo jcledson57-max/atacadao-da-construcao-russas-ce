@@ -16,6 +16,8 @@ export const Route = createFileRoute("/")({
       { name: "description", content: "Cimentos, vergalhões, arames, pregos e treliças. Monte seu orçamento online e envie pelo WhatsApp." },
       { property: "og:title", content: "Cimentos e Ferragens | Catálogo e orçamento online" },
       { property: "og:description", content: "Monte seu orçamento de cimentos e ferragens online, baixe em PDF e envie pelo WhatsApp." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Index,
