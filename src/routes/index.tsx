@@ -13,7 +13,7 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Atacadão da Construção" },
-      { name: "description", content: "Cimentos, vergalhões, arames, pregos e treliças. Monte seu orçamento online e envie pelo WhatsApp." },
+      { name: "description", content: "Cimentos, vergalhões, treliças, colunas, telas e ferragens em geral para a sua construção. Monte seu orçamento online e envie pelo WhatsApp." },
       { property: "og:title", content: "Cimentos e Ferragens | Catálogo e orçamento online" },
       { property: "og:description", content: "Monte seu orçamento de cimentos e ferragens online, baixe em PDF e envie pelo WhatsApp." },
       { property: "og:type", content: "website" },
