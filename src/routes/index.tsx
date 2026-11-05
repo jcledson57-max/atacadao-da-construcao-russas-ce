@@ -12,7 +12,7 @@ import { CartTotalBar } from "@/components/site/CartTotalBar";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Atacadão da Construção" },
+      { título: "Atacadão da Construção | Russas-CE" },
       { name: "description", content: "Cimentos, vergalhões, treliças, colunas, telas e ferragens em geral para a sua construção. Monte seu orçamento online e envie pelo WhatsApp." },
       { property: "og:title", content: "Cimentos e Ferragens | Catálogo e orçamento online" },
       { property: "og:description", content: "Monte seu orçamento de cimentos e ferragens online, baixe em PDF e envie pelo WhatsApp." },
