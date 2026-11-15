@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { Brand } from "@/components/site/Brand";
 import { QuoteTable } from "@/components/site/QuoteTable";
+import { NotificationBell } from "@/components/site/NotificationBell";
 import { QuoteRetention } from "@/components/site/QuoteRetention";
 import { DemoBadge } from "@/components/site/ProductCard";
 import { Button } from "@/components/ui/button";
@@ -35,6 +36,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
       { name: "robots", content: "noindex" },
     ],
   }),
+  validateSearch: (s: Record<string, unknown>) => ({ orcamento: typeof s.orcamento === "string" ? s.orcamento : undefined }),
   component: AdminPage,
 });
 
@@ -56,7 +58,7 @@ function AdminPage() {
     queryFn: async () => {
       const { data: u } = await supabase.auth.getUser();
       const { data } = await supabase.from("user_roles").select("role").eq("user_id", u.user!.id).eq("role", "admin");
-      return { isAdmin: !!data?.length, email: u.user?.email };
+      return { isAdmin: !!data?.length, email: u.user?.email, userId: u.user!.id };
     },
   });
   async function signOut() {
@@ -74,6 +76,7 @@ function AdminPage() {
           <Brand />
           <div className="flex items-center gap-2">
             <span className="hidden text-sm text-muted-foreground sm:inline">{role.data?.email}</span>
+            {role.data?.isAdmin && <NotificationBell userId={role.data.userId} />}
             <Button variant="outline" size="sm" onClick={signOut}><LogOut /> Sair</Button>
           </div>
         </div>
@@ -91,7 +94,7 @@ function AdminPage() {
         ) : (
           <>
             <h1 className="mb-6 text-4xl font-extrabold uppercase text-primary">Painel administrativo</h1>
-            <Tabs defaultValue="orcamentos">
+            <Tabs defaultValue="orcamentos" key={orcamento ? "o" + orcamento : "t"}>
               <TabsList className="mb-6 flex h-auto flex-wrap">
                 <TabsTrigger value="orcamentos">Orçamentos</TabsTrigger>
                 <TabsTrigger value="produtos">Produtos</TabsTrigger>
@@ -340,6 +343,15 @@ function QuotesTab() {
   });
   const [sel, setSel] = useState<SavedQuote & { origin: string } | null>(null);
   const [q, setQ] = useState("");
+  const { orcamento } = Route.useSearch();
+  const nav = useNavigate();
+  useEffect(() => {
+    if (!orcamento) return;
+    const x = quotes.find((y) => y.id === orcamento);
+    if (!x) return;
+    setSel({ ...x, total: Number(x.total), items: x.quote_items.map((i) => ({ ...i, unit_price: Number(i.unit_price), quantity: Number(i.quantity), subtotal: Number(i.subtotal) })) });
+    nav({ to: "/admin", search: {}, replace: true });
+  }, [orcamento, quotes, nav]);
   const list = quotes.filter((x) => `${x.code} ${x.customer_name} ${x.customer_phone}`.toLowerCase().includes(q.toLowerCase()));
 
   return (
