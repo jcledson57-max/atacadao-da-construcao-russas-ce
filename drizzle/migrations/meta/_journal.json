@@ -15,6 +15,13 @@
       "when": 1793535176003,
       "tag": "0001_quote_retention_audit",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794747429708,
+      "tag": "0002_quote_notification_reads",
+      "breakpoints": true
     }
   ]
 }

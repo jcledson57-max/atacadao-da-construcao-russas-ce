@@ -165,6 +165,32 @@ export type Database = {
           },
         ]
       }
+      quote_reads: {
+        Row: {
+          quote_id: string
+          read_at: string
+          user_id: string
+        }
+        Insert: {
+          quote_id: string
+          read_at?: string
+          user_id: string
+        }
+        Update: {
+          quote_id?: string
+          read_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quote_reads_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       quotes: {
         Row: {
           code: string
