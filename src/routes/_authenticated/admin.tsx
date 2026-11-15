@@ -36,7 +36,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
       { name: "robots", content: "noindex" },
     ],
   }),
-  validateSearch: (s: Record<string, unknown>): { orcamento?: string } => ({ orcamento: typeof s.orcamento === "string" ? s.orcamento : undefined }),
+  validateSearch: (s: Record<string, unknown>): { orcamento?: string } => (typeof s["orcamento"] === "string" ? { orcamento: s["orcamento"] } : {}),
   component: AdminPage,
 });
 
