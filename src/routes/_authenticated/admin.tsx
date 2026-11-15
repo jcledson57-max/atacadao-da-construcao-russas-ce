@@ -36,7 +36,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
       { name: "robots", content: "noindex" },
     ],
   }),
-  validateSearch: (s: Record<string, unknown>) => ({ orcamento: typeof s.orcamento === "string" ? s.orcamento : undefined }),
+  validateSearch: (s: Record<string, unknown>): { orcamento?: string } => ({ orcamento: typeof s.orcamento === "string" ? s.orcamento : undefined }),
   component: AdminPage,
 });
 
@@ -61,6 +61,9 @@ function AdminPage() {
       return { isAdmin: !!data?.length, email: u.user?.email, userId: u.user!.id };
     },
   });
+  const { orcamento } = Route.useSearch();
+  const [tab, setTab] = useState("orcamentos");
+  useEffect(() => { if (orcamento) setTab("orcamentos"); }, [orcamento]);
   async function signOut() {
     await qc.cancelQueries();
     qc.clear();
@@ -94,7 +97,7 @@ function AdminPage() {
         ) : (
           <>
             <h1 className="mb-6 text-4xl font-extrabold uppercase text-primary">Painel administrativo</h1>
-            <Tabs defaultValue="orcamentos" key={orcamento ? "o" + orcamento : "t"}>
+            <Tabs value={tab} onValueChange={setTab}>
               <TabsList className="mb-6 flex h-auto flex-wrap">
                 <TabsTrigger value="orcamentos">Orçamentos</TabsTrigger>
                 <TabsTrigger value="produtos">Produtos</TabsTrigger>
