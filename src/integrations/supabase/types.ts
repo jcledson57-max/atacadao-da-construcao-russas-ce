@@ -94,6 +94,57 @@ export type Database = {
           },
         ]
       }
+      profiles: {
+        Row: {
+          blocked: boolean
+          created_at: string
+          deleted_at: string | null
+          full_name: string
+          id: string
+        }
+        Insert: {
+          blocked?: boolean
+          created_at?: string
+          deleted_at?: string | null
+          full_name?: string
+          id: string
+        }
+        Update: {
+          blocked?: boolean
+          created_at?: string
+          deleted_at?: string | null
+          full_name?: string
+          id?: string
+        }
+        Relationships: []
+      }
+      quote_access_events: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          quote_id: string
+          user_id: string
+          user_name: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: string
+          quote_id: string
+          user_id: string
+          user_name: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          quote_id?: string
+          user_id?: string
+          user_name?: string
+        }
+        Relationships: []
+      }
       quote_cleanup_history: {
         Row: {
           admin_email: string
@@ -274,6 +325,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_read_quotes: { Args: never; Returns: boolean }
       create_quote: {
         Args: { _address: string; _items: Json; _name: string; _phone: string }
         Returns: Json
@@ -294,6 +346,17 @@ export type Database = {
         }
         Returns: boolean
       }
+      manage_team_account: {
+        Args: {
+          _actor: string
+          _blocked: boolean
+          _delete?: boolean
+          _name: string
+          _role: Database["public"]["Enums"]["app_role"]
+          _target: string
+        }
+        Returns: undefined
+      }
       quote_cleanup_history_recent: {
         Args: never
         Returns: {
@@ -311,6 +374,10 @@ export type Database = {
           isOneToOne: false
           isSetofReturn: true
         }
+      }
+      record_quote_access: {
+        Args: { _action: string; _quote_id: string }
+        Returns: undefined
       }
     }
     Enums: {
