@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Eye, Loader2, LogOut, Pencil, Plus, ShieldAlert } from "lucide-react";
+import { Eye, Loader2, LogOut, Pencil, Plus, ShieldAlert, Printer, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -18,6 +18,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { formatBRL, formatDateTime, formatPhone } from "@/lib/format";
+import { currentTeamAccess, teamAccessQuery, roleLabel } from "@/lib/team-access";
 import { DISCLAIMER, downloadQuotePdf, type SavedQuote } from "@/lib/quote-output";
 import {
   categoriesQuery, IMAGE_BUCKET, productsQuery, settingsQuery, STORAGE_PREFIX,
@@ -25,6 +26,10 @@ import {
 } from "@/lib/store";
 
 export const Route = createFileRoute("/_authenticated/admin")({
+  beforeLoad: async () => {
+    const access = await currentTeamAccess();
+    return { team: access };
+  },
   head: () => ({
     meta: [
       { title: "Painel administrativo" },
@@ -53,14 +58,7 @@ async function uploadImage(file: File): Promise<string> {
 function AdminPage() {
   const navigate = useNavigate();
   const qc = useQueryClient();
-  const role = useQuery({
-    queryKey: ["is-admin"],
-    queryFn: async () => {
-      const { data: u } = await supabase.auth.getUser();
-      const { data } = await supabase.from("user_roles").select("role").eq("user_id", u.user!.id).eq("role", "admin");
-      return { isAdmin: !!data?.length, email: u.user?.email, userId: u.user!.id };
-    },
-  });
+  const role = useQuery(teamAccessQuery);
   const { orcamento } = Route.useSearch();
   const [tab, setTab] = useState("orcamentos");
   useEffect(() => { if (orcamento) setTab("orcamentos"); }, [orcamento]);
@@ -78,8 +76,8 @@ function AdminPage() {
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
           <Brand />
           <div className="flex items-center gap-2">
-            <span className="hidden text-sm text-muted-foreground sm:inline">{role.data?.email}</span>
-            {role.data?.isAdmin && <NotificationBell userId={role.data.userId} />}
+            <span className="hidden text-sm text-muted-foreground sm:inline">{role.data?.name} · {roleLabel(role.data?.role ?? null)}</span>
+            {role.data?.manage && <NotificationBell userId={role.data.userId} />}
             <Button variant="outline" size="sm" onClick={signOut}><LogOut /> Sair</Button>
           </div>
         </div>
@@ -87,27 +85,27 @@ function AdminPage() {
       <div className="mx-auto max-w-6xl px-4 py-8">
         {role.isLoading ? (
           <Loader2 className="animate-spin" />
-        ) : !role.data?.isAdmin ? (
+        ) : !role.data?.quotes ? (
           <div className="rounded-lg border bg-card p-8 text-center">
             <ShieldAlert className="mx-auto h-10 w-10 text-destructive" />
             <h1 className="mt-3 text-2xl font-bold text-primary">Acesso negado</h1>
-            <p className="text-muted-foreground">Esta conta não tem permissão de administrador.</p>
+            <p className="text-muted-foreground">Esta conta está bloqueada ou não tem acesso ao painel.</p>
             <Button asChild className="mt-4"><Link to="/">Voltar ao site</Link></Button>
           </div>
         ) : (
           <>
             <h1 className="mb-6 text-4xl font-extrabold uppercase text-primary">Painel administrativo</h1>
             <Tabs value={tab} onValueChange={setTab}>
-              <TabsList className="mb-6 flex h-auto flex-wrap">
+              <div className="flex flex-col gap-6 md:flex-row"><TabsList className="flex h-auto flex-wrap items-start gap-1 md:w-48 md:shrink-0 md:flex-col md:justify-start">
                 <TabsTrigger value="orcamentos">Orçamentos</TabsTrigger>
-                <TabsTrigger value="produtos">Produtos</TabsTrigger>
+                {role.data.manage && <><TabsTrigger value="produtos">Produtos</TabsTrigger>
                 <TabsTrigger value="categorias">Categorias</TabsTrigger>
-                <TabsTrigger value="loja">Configurações da loja</TabsTrigger>
+                <TabsTrigger value="loja">Configurações da loja</TabsTrigger><Button asChild variant="ghost" className="w-full justify-start"><Link to="/usuarios"><Users /> Usuários e Permissões</Link></Button></>}
               </TabsList>
-              <TabsContent value="orcamentos"><QuotesTab /></TabsContent>
-              <TabsContent value="produtos"><ProductsTab /></TabsContent>
+              <div className="min-w-0 flex-1"><TabsContent value="orcamentos"><QuotesTab isAdmin={role.data.manage} /></TabsContent>
+              {role.data.manage && <><TabsContent value="produtos"><ProductsTab /></TabsContent>
               <TabsContent value="categorias"><CategoriesTab /></TabsContent>
-              <TabsContent value="loja"><SettingsTab /></TabsContent>
+              <TabsContent value="loja"><SettingsTab /></TabsContent></>}</div></div>
             </Tabs>
           </>
         )}
@@ -222,7 +220,7 @@ function ProductsTab() {
               <div className="space-y-1"><Label>Descrição</Label><Textarea value={draft.description} maxLength={1000} onChange={(e) => setDraft({ ...draft, description: e.target.value })} /></div>
               <div className="space-y-1">
                 <Label>Foto</Label>
-                {(file || draft.image) && <img src={file ? URL.createObjectURL(file) : draft.image!} alt="" className="h-24 w-24 rounded object-cover" />}
+                {(file || draft.image) && <img src={file ? URL.createObjectURL(file) : draft.image ?? ""} alt="" className="h-24 w-24 rounded object-cover" />}
                 <Input type="file" accept="image/*" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
               </div>
               <label className="flex items-center gap-2 text-sm"><Switch checked={draft.active} onCheckedChange={(v) => setDraft({ ...draft, active: v })} /> Ativo no catálogo</label>
@@ -325,7 +323,7 @@ function SettingsTab() {
       <div className="space-y-1"><Label>Endereço da loja</Label><Textarea value={form.address} maxLength={300} onChange={(e) => setForm({ ...form, address: e.target.value })} /></div>
       <div className="space-y-1">
         <Label>Logotipo</Label>
-        {(file || data?.logo) && <img src={file ? URL.createObjectURL(file) : data!.logo!} alt="" className="h-16 w-16 rounded object-contain" />}
+        {(file || data?.logo) && <img src={file ? URL.createObjectURL(file) : data?.logo ?? ""} alt="" className="h-16 w-16 rounded object-contain" />}
         <Input type="file" accept="image/png,image/jpeg" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
       </div>
       <Button variant="accent" onClick={save} disabled={busy}>{busy && <Loader2 className="animate-spin" />} Salvar configurações</Button>
@@ -334,7 +332,7 @@ function SettingsTab() {
 }
 
 /* ---------------- Orçamentos ---------------- */
-function QuotesTab() {
+function QuotesTab({ isAdmin }: { isAdmin: boolean }) {
   const { data: settings } = useQuery(settingsQuery);
   const { data: quotes = [], isLoading } = useQuery({
     queryKey: ["quotes"],
@@ -355,11 +353,27 @@ function QuotesTab() {
     setSel({ ...x, total: Number(x.total), items: x.quote_items.map((i) => ({ ...i, unit_price: Number(i.unit_price), quantity: Number(i.quantity), subtotal: Number(i.subtotal) })) });
     nav({ to: "/admin", search: {}, replace: true });
   }, [orcamento, quotes, nav]);
+  useEffect(() => {
+    if (!sel) return;
+    supabase.rpc("record_quote_access", { _quote_id: sel.id, _action: "view" }).then(({ error }) => { if (error) toast.error("Não foi possível registrar a consulta."); });
+  }, [sel?.id]);
+  const history = useQuery({ queryKey: ["quote-access-history", sel?.id], enabled: isAdmin && !!sel, queryFn: async () => {
+    if (!sel) return [];
+    const result = await supabase.from("quote_access_events").select("*").eq("quote_id", sel.id).order("created_at", { ascending: false }).limit(20);
+    if (result.error) throw result.error; return result.data;
+  } });
+  async function printQuote() {
+    if (!sel) return;
+    const audit = await supabase.rpc("record_quote_access", { _quote_id: sel.id, _action: "print" });
+    if (audit.error) { toast.error("Não foi possível registrar a impressão."); return; }
+    await downloadQuotePdf(sel, settings, true);
+    history.refetch();
+  }
   const list = quotes.filter((x) => `${x.code} ${x.customer_name} ${x.customer_phone}`.toLowerCase().includes(q.toLowerCase()));
 
   return (
     <div>
-      <QuoteRetention />
+      {isAdmin && <QuoteRetention />}
       <Input className="mb-4 max-w-sm" placeholder="Buscar por número, cliente ou telefone" value={q} onChange={(e) => setQ(e.target.value)} />
       {isLoading ? <Loader2 className="animate-spin" /> : list.length === 0 ? (
         <p className="text-muted-foreground">Nenhum orçamento recebido ainda.</p>
@@ -403,10 +417,12 @@ function QuotesTab() {
               <p className="mt-3 text-xs text-muted-foreground">Preços registrados no momento do orçamento. {DISCLAIMER}</p>
               <div className="mt-4 flex flex-wrap gap-2">
                 <Button onClick={() => downloadQuotePdf(sel, settings)}>Baixar PDF</Button>
-                <Button asChild variant="whatsapp">
+                <Button onClick={printQuote}><Printer /> Imprimir orçamento</Button>
+                {isAdmin && <Button asChild variant="whatsapp">
                   <a href={`https://wa.me/55${sel.customer_phone.replace(/^55/, "")}`} target="_blank" rel="noopener noreferrer">Chamar cliente no WhatsApp</a>
-                </Button>
+                </Button>}
               </div>
+              {isAdmin && <div className="mt-5 border-t pt-3"><h3 className="font-semibold">Histórico de consultas e impressão</h3>{history.data?.map(e => <p key={e.id} className="mt-1 text-xs text-muted-foreground">{e.user_name || "Usuário"} · {e.action === "print" ? "Impressão solicitada" : "Visualizou"} · {formatDateTime(e.created_at)}</p>)}</div>}
             </div>
           )}
         </DialogContent>

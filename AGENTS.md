@@ -11,9 +11,12 @@
 
 ## Project rules
 - Quotes are created only via the `create_quote` SECURITY DEFINER RPC, which reads prices from `products` and snapshots them into `quote_items`; never trust client prices.
-- Admin access = row in `user_roles` with role `admin`; the first signed-up user is auto-promoted by trigger. All writes are guarded by RLS with `has_role`.
+- Team roles live only in `user_roles`; `has_role` also checks profile blocked/deleted state so old tokens cannot bypass revocation. Signup creates profiles but never assigns privileges after initial bootstrap.
 - Store images live in the private `store-images` bucket (public buckets are blocked); DB stores `storage:<path>` and the client resolves signed URLs in `src/lib/store.ts`.
 - PDF generation is client-side (jspdf + jspdf-autotable) in `src/lib/quote-output.ts`, so it works on any device without server runtime constraints.
 - GitHub Pages build is opt-in via `GITHUB_PAGES=true` (static SPA, base from `PAGES_BASE`, output `dist/client`); default build stays the Lovable/Cloudflare one so preview and publish are unaffected.
 - Site-relative image paths go through `withBase()` in `src/lib/store.ts` so they work under a subfolder base path.
 - Quote retention uses RLS-protected exact counts and paginated CSV reads; cleanup runs only through the admin-validated delete_old_quotes RPC, which checks the confirmed count and records audit history in the same transaction as cascading deletion.
+- Account administration uses authenticated server functions with an RLS role check before loading the privileged client; `manage_team_account` serializes role/status changes and database triggers guard the last active administrator.
+- Deleted team accounts are archived and banned rather than physically removed so quote access audit identities remain intact. Quote consultation/print requests append to `quote_access_events` through an authorized RPC.
+- `/usuarios` has an admin-only gate; the existing `/admin` surface renders quote-only controls for attendants. Privileged account functions require the hosted TanStack runtime, not the optional static GitHub Pages build.

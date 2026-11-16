@@ -33,7 +33,7 @@ async function toDataUrl(url: string): Promise<{ data: string; fmt: string } | n
   }
 }
 
-export async function downloadQuotePdf(q: SavedQuote, s: StoreSettings | undefined) {
+export async function downloadQuotePdf(q: SavedQuote, s: StoreSettings | undefined, print = false) {
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const W = doc.internal.pageSize.getWidth();
   doc.setFillColor(28, 42, 74);
@@ -100,7 +100,12 @@ export async function downloadQuotePdf(q: SavedQuote, s: StoreSettings | undefin
   doc.setFontSize(8.5);
   doc.setTextColor(90, 90, 90);
   doc.text(doc.splitTextToSize(DISCLAIMER, W - 28), 14, endY);
-  doc.save(`orcamento-${q.code}.pdf`);
+  if (print) {
+    doc.autoPrint();
+    const url = URL.createObjectURL(doc.output("blob"));
+    window.open(url, "_blank");
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+  } else doc.save(`orcamento-${q.code}.pdf`);
 }
 
 export function whatsappMessage(q: SavedQuote) {
