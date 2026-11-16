@@ -22,6 +22,13 @@
       "when": 1794747429708,
       "tag": "0002_quote_notification_reads",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1794833254825,
+      "tag": "0003_team_attendant_role",
+      "breakpoints": true
     }
   ]
 }
