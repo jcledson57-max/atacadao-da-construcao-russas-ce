@@ -34,6 +34,7 @@ export const saveTeamAccount = createServerFn({ method: 'POST' }).middleware([re
     const { supabaseAdmin } = await import('@/integrations/supabase/client.server');
     let id = data.id;
     if (!id) {
+      if (!data.password) throw new Error('Defina a senha inicial.');
       const created = await supabaseAdmin.auth.admin.createUser({ email: data.email, password: data.password, email_confirm: true, user_metadata: { full_name: data.name } });
       if (created.error || !created.data.user) throw new Error('Não foi possível criar a conta. Verifique se o e-mail já está cadastrado.');
       id = created.data.user.id;

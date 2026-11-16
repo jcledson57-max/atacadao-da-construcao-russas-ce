@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { roleLabel } from '@/lib/team-access';
 
-export function TeamHeader({ name, role }: { name?: string; role?: string | null }) {
+export function TeamHeader({ name, role }: { name?: string | undefined; role?: string | null | undefined }) {
   const qc = useQueryClient(); const navigate = useNavigate();
   async function signOut() {
     await qc.cancelQueries(); qc.clear(); await supabase.auth.signOut(); navigate({ to: '/auth', replace: true });
