@@ -33,7 +33,7 @@ async function toDataUrl(url: string): Promise<{ data: string; fmt: string } | n
   }
 }
 
-export async function downloadQuotePdf(q: SavedQuote, s: StoreSettings | undefined, print = false) {
+export async function downloadQuotePdf(q: SavedQuote, s: StoreSettings | undefined, print = false, preview?: Window) {
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const W = doc.internal.pageSize.getWidth();
   doc.setFillColor(28, 42, 74);
@@ -103,7 +103,8 @@ export async function downloadQuotePdf(q: SavedQuote, s: StoreSettings | undefin
   if (print) {
     doc.autoPrint();
     const url = URL.createObjectURL(doc.output("blob"));
-    window.open(url, "_blank");
+    if (preview) preview.location.href = url;
+    else window.open(url, "_blank");
     setTimeout(() => URL.revokeObjectURL(url), 60000);
   } else doc.save(`orcamento-${q.code}.pdf`);
 }

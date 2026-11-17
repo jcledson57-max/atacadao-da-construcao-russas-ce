@@ -5,6 +5,6 @@
 - [x] Testes sem excluir registros reais: download e confirmação com respostas simuladas; banco real preservado.
 
 # Usuários e permissões
-- [ ] Reaproveitar funções existentes, criar perfis e proteger administradores/atendentes no banco.
-- [ ] Gestão de contas, identidade conectada e navegação restrita no painel.
-- [ ] Consulta/impressão com registro de ações e validação dos dois acessos.
+- [x] Reaproveitar funções existentes, criar perfis e proteger administradores/atendentes no banco.
+- [x] Gestão de contas, identidade conectada e navegação restrita no painel.
+- [x] Consulta/impressão com registro de ações; login real de atendente, bloqueio de API, último administrador e impressão validados.

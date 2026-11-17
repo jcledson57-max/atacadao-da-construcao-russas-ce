@@ -37,7 +37,7 @@ function AuthPage() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => data.session && navigate({ to: "/admin" }));
+    supabase.auth.getUser().then(({ data }) => data.user && navigate({ to: "/admin" }));
   }, [navigate]);
 
   async function submit(e: React.FormEvent) {
@@ -53,7 +53,7 @@ function AuthPage() {
     } else {
       const { data, error } = await supabase.auth.signUp({
         ...p.data,
-        options: { emailRedirectTo: `${window.location.origin}/admin` },
+        options: { emailRedirectTo: window.location.origin },
       });
       setBusy(false);
       if (error) { toast.error(error.message); return; }
@@ -75,7 +75,7 @@ function AuthPage() {
         <button className="mt-4 text-sm text-muted-foreground hover:text-primary" onClick={() => setMode(mode === "in" ? "up" : "in")}>
           {mode === "in" ? "Primeiro acesso? Criar conta" : "Já tenho conta — entrar"}
         </button>
-        <p className="mt-3 text-xs text-muted-foreground">A primeira conta criada torna-se a administradora. Contas criadas depois não têm acesso ao painel.</p>
+        <p className="mt-3 text-xs text-muted-foreground">O acesso da equipe é autorizado pelo administrador em Usuários e Permissões.</p>
       </div>
     </div>
   );
