@@ -1,3 +1,4 @@
+
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Eye, Loader2, LogOut, Pencil, Plus, ShieldAlert, Printer, Users } from "lucide-react";
@@ -41,7 +42,8 @@ export const Route = createFileRoute("/_authenticated/admin")({
       { name: "robots", content: "noindex" },
     ],
   }),
-  validateSearch: (s: Record<string, unknown>): { orcamento?: string } => (typeof s["orcamento"] === "string" ? { orcamento: s["orcamento"] } : {}),
+  validateSearch: (s: Record<string, unknown>): { orcamento?: string } =>
+    typeof s["orcamento"] === "string" ? { orcamento: s["orcamento"] } : {},
   component: AdminPage,
 });
 
@@ -61,7 +63,11 @@ function AdminPage() {
   const role = useQuery(teamAccessQuery);
   const { orcamento } = Route.useSearch();
   const [tab, setTab] = useState("orcamentos");
-  useEffect(() => { if (orcamento) setTab("orcamentos"); }, [orcamento]);
+
+  useEffect(() => {
+    if (orcamento) setTab("orcamentos");
+  }, [orcamento]);
+
   async function signOut() {
     await qc.cancelQueries();
     qc.clear();
@@ -76,36 +82,93 @@ function AdminPage() {
         <div className="mx-auto flex min-h-16 max-w-6xl flex-wrap items-center justify-between gap-2 px-4 py-3">
           <Brand />
           <div className="flex items-center gap-2">
-            <span className="max-w-full break-words text-sm text-muted-foreground">{role.data?.name} · {roleLabel(role.data?.role ?? null)}</span>
+            <span className="max-w-full break-words text-sm text-muted-foreground">
+              {role.data?.name} · {roleLabel(role.data?.role ?? null)}
+            </span>
             {role.data?.manage && <NotificationBell userId={role.data.userId} />}
-            <Button variant="outline" size="sm" onClick={signOut}><LogOut /> Sair</Button>
+            <Button variant="outline" size="sm" onClick={signOut}>
+              <LogOut /> Sair
+            </Button>
           </div>
         </div>
       </header>
-      <div className="mx-auto max-w-6xl px-4 py-8">
+
+      <div className="mx-auto max-w-6xl px-4 py-6">
         {role.isLoading ? (
           <Loader2 className="animate-spin" />
         ) : !role.data?.quotes ? (
           <div className="rounded-lg border bg-card p-8 text-center">
             <ShieldAlert className="mx-auto h-10 w-10 text-destructive" />
             <h1 className="mt-3 text-2xl font-bold text-primary">Acesso negado</h1>
-            <p className="text-muted-foreground">Esta conta está bloqueada ou não tem acesso ao painel.</p>
-            <Button asChild className="mt-4"><Link to="/">Voltar ao site</Link></Button>
+            <p className="text-muted-foreground">
+              Esta conta está bloqueada ou não tem acesso ao painel.
+            </p>
+            <Button asChild className="mt-4">
+              <Link to="/">Voltar ao site</Link>
+            </Button>
           </div>
         ) : (
           <>
-            <h1 className="mb-6 text-4xl font-extrabold uppercase text-primary">Painel administrativo</h1>
+            <h1 className="mb-4 text-3xl font-extrabold uppercase text-primary">
+              Painel administrativo
+            </h1>
+
             <Tabs value={tab} onValueChange={setTab}>
-              <div className="flex flex-col gap-6 md:flex-row"><TabsList className="flex h-auto flex-wrap items-start gap-1 md:w-48 md:shrink-0 md:flex-col md:justify-start">
-                <TabsTrigger value="orcamentos">Orçamentos</TabsTrigger>
-                {role.data.manage && <><TabsTrigger value="produtos">Produtos</TabsTrigger>
-                <TabsTrigger value="categorias">Categorias</TabsTrigger>
-                <TabsTrigger value="loja">Configurações da loja</TabsTrigger><Button asChild variant="ghost" className="w-full justify-start"><Link to="/usuarios"><Users /> Usuários e Permissões</Link></Button></>}
-              </TabsList>
-              <div className="min-w-0 flex-1"><TabsContent value="orcamentos"><QuotesTab isAdmin={role.data.manage} /></TabsContent>
-              {role.data.manage && <><TabsContent value="produtos"><ProductsTab /></TabsContent>
-              <TabsContent value="categorias"><CategoriesTab /></TabsContent>
-              <TabsContent value="loja"><SettingsTab /></TabsContent></>}</div></div>
+              <div className="flex flex-col gap-5 md:flex-row md:items-start">
+                <aside className="w-full shrink-0 space-y-4 md:w-56">
+                  <TabsList className="flex h-auto w-full flex-wrap items-start gap-1 md:flex-col md:justify-start">
+                    <TabsTrigger value="orcamentos" className="w-full justify-start">
+                      Orçamentos
+                    </TabsTrigger>
+
+                    {role.data.manage && (
+                      <>
+                        <TabsTrigger value="produtos" className="w-full justify-start">
+                          Produtos
+                        </TabsTrigger>
+                        <TabsTrigger value="categorias" className="w-full justify-start">
+                          Categorias
+                        </TabsTrigger>
+                        <TabsTrigger value="loja" className="w-full justify-start">
+                          Configurações da loja
+                        </TabsTrigger>
+
+                        <Button asChild variant="ghost" className="w-full justify-start">
+                          <Link to="/usuarios">
+                            <Users /> Usuários e Permissões
+                          </Link>
+                        </Button>
+                      </>
+                    )}
+                  </TabsList>
+
+                  {role.data.manage && (
+                    <div className="rounded-lg border bg-card p-3">
+                      <QuoteRetention />
+                    </div>
+                  )}
+                </aside>
+
+                <main className="min-w-0 flex-1">
+                  <TabsContent value="orcamentos" className="mt-0">
+                    <QuotesTab isAdmin={role.data.manage} />
+                  </TabsContent>
+
+                  {role.data.manage && (
+                    <>
+                      <TabsContent value="produtos" className="mt-0">
+                        <ProductsTab />
+                      </TabsContent>
+                      <TabsContent value="categorias" className="mt-0">
+                        <CategoriesTab />
+                      </TabsContent>
+                      <TabsContent value="loja" className="mt-0">
+                        <SettingsTab />
+                      </TabsContent>
+                    </>
+                  )}
+                </main>
+              </div>
             </Tabs>
           </>
         )}
@@ -125,7 +188,18 @@ const productSchema = z.object({
   is_demo: z.boolean(),
 });
 
-type Draft = { id?: string; name: string; category_id: string; description: string; unit: string; price: string; active: boolean; is_demo: boolean; image_url: string | null; image?: string | null | undefined };
+type Draft = {
+  id?: string;
+  name: string;
+  category_id: string;
+  description: string;
+  unit: string;
+  price: string;
+  active: boolean;
+  is_demo: boolean;
+  image_url: string | null;
+  image?: string | null | undefined;
+};
 
 function ProductsTab() {
   const qc = useQueryClient();
@@ -137,15 +211,43 @@ function ProductsTab() {
 
   function open(p?: Product) {
     setFile(null);
-    setDraft(p
-      ? { id: p.id, name: p.name, category_id: p.category_id, description: p.description, unit: p.unit, price: String(p.price).replace(".", ","), active: p.active, is_demo: p.is_demo, image_url: p.image_url, image: p.image }
-      : { name: "", category_id: categories[0]?.id ?? "", description: "", unit: "unidade", price: "", active: true, is_demo: false, image_url: null });
+    setDraft(
+      p
+        ? {
+            id: p.id,
+            name: p.name,
+            category_id: p.category_id,
+            description: p.description,
+            unit: p.unit,
+            price: String(p.price).replace(".", ","),
+            active: p.active,
+            is_demo: p.is_demo,
+            image_url: p.image_url,
+            image: p.image,
+          }
+        : {
+            name: "",
+            category_id: categories[0]?.id ?? "",
+            description: "",
+            unit: "unidade",
+            price: "",
+            active: true,
+            is_demo: false,
+            image_url: null,
+          },
+    );
   }
 
   async function save() {
     if (!draft) return;
-    const parsed = productSchema.safeParse({ ...draft, price: Number(draft.price.replace(/\./g, "").replace(",", ".")) });
-    if (!parsed.success) { toast.error(parsed.error.issues[0]?.message ?? "Dados inválidos"); return; }
+    const parsed = productSchema.safeParse({
+      ...draft,
+      price: Number(draft.price.replace(/\./g, "").replace(",", ".")),
+    });
+    if (!parsed.success) {
+      toast.error(parsed.error.issues[0]?.message ?? "Dados inválidos");
+      return;
+    }
     setBusy(true);
     try {
       const image_url = file ? await uploadImage(file) : draft.image_url;
@@ -166,7 +268,10 @@ function ProductsTab() {
 
   async function toggle(p: Product) {
     const { error } = await supabase.from("products").update({ active: !p.active }).eq("id", p.id);
-    if (error) { toast.error(error.message); return; }
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     qc.invalidateQueries({ queryKey: ["products"] });
   }
 
@@ -174,12 +279,21 @@ function ProductsTab() {
     <div>
       <div className="mb-4 flex justify-between gap-2">
         <p className="text-sm text-muted-foreground">{products.length} produtos</p>
-        <Button variant="accent" onClick={() => open()} disabled={!categories.length}><Plus /> Novo produto</Button>
+        <Button variant="accent" onClick={() => open()} disabled={!categories.length}>
+          <Plus /> Novo produto
+        </Button>
       </div>
       <div className="overflow-x-auto rounded-lg border bg-card">
         <table className="w-full text-sm">
           <thead className="bg-muted text-left text-xs uppercase text-muted-foreground">
-            <tr><th className="p-3">Produto</th><th className="p-3">Categoria</th><th className="p-3">Unidade</th><th className="p-3 text-right">Preço</th><th className="p-3">Ativo</th><th className="p-3" /></tr>
+            <tr>
+              <th className="p-3">Produto</th>
+              <th className="p-3">Categoria</th>
+              <th className="p-3">Unidade</th>
+              <th className="p-3 text-right">Preço</th>
+              <th className="p-3">Ativo</th>
+              <th className="p-3" />
+            </tr>
           </thead>
           <tbody>
             {products.map((p) => (
@@ -187,14 +301,23 @@ function ProductsTab() {
                 <td className="p-3">
                   <div className="flex items-center gap-3">
                     {p.image && <img src={p.image} alt="" className="h-10 w-10 rounded object-cover" />}
-                    <div><p className="font-semibold">{p.name}</p>{p.is_demo && <DemoBadge />}</div>
+                    <div>
+                      <p className="font-semibold">{p.name}</p>
+                      {p.is_demo && <DemoBadge />}
+                    </div>
                   </div>
                 </td>
                 <td className="p-3">{categories.find((c) => c.id === p.category_id)?.name}</td>
                 <td className="p-3">{p.unit}</td>
                 <td className="p-3 text-right font-semibold">{formatBRL(p.price)}</td>
-                <td className="p-3"><Switch checked={p.active} onCheckedChange={() => toggle(p)} aria-label="Ativo" /></td>
-                <td className="p-3"><Button size="sm" variant="outline" onClick={() => open(p)}><Pencil /> Editar</Button></td>
+                <td className="p-3">
+                  <Switch checked={p.active} onCheckedChange={() => toggle(p)} aria-label="Ativo" />
+                </td>
+                <td className="p-3">
+                  <Button size="sm" variant="outline" onClick={() => open(p)}>
+                    <Pencil /> Editar
+                  </Button>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -203,29 +326,55 @@ function ProductsTab() {
 
       <Dialog open={!!draft} onOpenChange={(o) => !o && setDraft(null)}>
         <DialogContent className="max-h-[90vh] overflow-y-auto">
-          <DialogHeader><DialogTitle>{draft?.id ? "Editar produto" : "Novo produto"}</DialogTitle></DialogHeader>
+          <DialogHeader>
+            <DialogTitle>{draft?.id ? "Editar produto" : "Novo produto"}</DialogTitle>
+          </DialogHeader>
           {draft && (
             <div className="space-y-3">
-              <div className="space-y-1"><Label>Nome</Label><Input value={draft.name} maxLength={120} onChange={(e) => setDraft({ ...draft, name: e.target.value })} /></div>
+              <div className="space-y-1">
+                <Label>Nome</Label>
+                <Input value={draft.name} maxLength={120} onChange={(e) => setDraft({ ...draft, name: e.target.value })} />
+              </div>
               <div className="space-y-1">
                 <Label>Categoria</Label>
-                <select className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm" value={draft.category_id} onChange={(e) => setDraft({ ...draft, category_id: e.target.value })}>
+                <select
+                  className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+                  value={draft.category_id}
+                  onChange={(e) => setDraft({ ...draft, category_id: e.target.value })}
+                >
                   {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
               </div>
               <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1"><Label>Unidade de venda</Label><Input value={draft.unit} maxLength={20} placeholder="saco, barra, quilo" onChange={(e) => setDraft({ ...draft, unit: e.target.value })} /></div>
-                <div className="space-y-1"><Label>Preço (R$)</Label><Input value={draft.price} inputMode="decimal" placeholder="0,00" onChange={(e) => setDraft({ ...draft, price: e.target.value })} /></div>
+                <div className="space-y-1">
+                  <Label>Unidade de venda</Label>
+                  <Input value={draft.unit} maxLength={20} placeholder="saco, barra, quilo" onChange={(e) => setDraft({ ...draft, unit: e.target.value })} />
+                </div>
+                <div className="space-y-1">
+                  <Label>Preço (R$)</Label>
+                  <Input value={draft.price} inputMode="decimal" placeholder="0,00" onChange={(e) => setDraft({ ...draft, price: e.target.value })} />
+                </div>
               </div>
-              <div className="space-y-1"><Label>Descrição</Label><Textarea value={draft.description} maxLength={1000} onChange={(e) => setDraft({ ...draft, description: e.target.value })} /></div>
+              <div className="space-y-1">
+                <Label>Descrição</Label>
+                <Textarea value={draft.description} maxLength={1000} onChange={(e) => setDraft({ ...draft, description: e.target.value })} />
+              </div>
               <div className="space-y-1">
                 <Label>Foto</Label>
-                {(file || draft.image) && <img src={file ? URL.createObjectURL(file) : draft.image ?? ""} alt="" className="h-24 w-24 rounded object-cover" />}
+                {(file || draft.image) && (
+                  <img src={file ? URL.createObjectURL(file) : draft.image ?? ""} alt="" className="h-24 w-24 rounded object-cover" />
+                )}
                 <Input type="file" accept="image/*" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
               </div>
-              <label className="flex items-center gap-2 text-sm"><Switch checked={draft.active} onCheckedChange={(v) => setDraft({ ...draft, active: v })} /> Ativo no catálogo</label>
-              <label className="flex items-center gap-2 text-sm"><Switch checked={draft.is_demo} onCheckedChange={(v) => setDraft({ ...draft, is_demo: v })} /> Produto de demonstração (preço fictício)</label>
-              <Button variant="accent" className="w-full" onClick={save} disabled={busy}>{busy && <Loader2 className="animate-spin" />} Salvar</Button>
+              <label className="flex items-center gap-2 text-sm">
+                <Switch checked={draft.active} onCheckedChange={(v) => setDraft({ ...draft, active: v })} /> Ativo no catálogo
+              </label>
+              <label className="flex items-center gap-2 text-sm">
+                <Switch checked={draft.is_demo} onCheckedChange={(v) => setDraft({ ...draft, is_demo: v })} /> Produto de demonstração (preço fictício)
+              </label>
+              <Button variant="accent" className="w-full" onClick={save} disabled={busy}>
+                {busy && <Loader2 className="animate-spin" />} Salvar
+              </Button>
             </div>
           )}
         </DialogContent>
@@ -235,7 +384,9 @@ function ProductsTab() {
 }
 
 /* ---------------- Categorias ---------------- */
-const slugify = (s: string) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 60);
+const slugify = (s: string) =>
+  s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 60);
 
 function CategoriesTab() {
   const qc = useQueryClient();
@@ -245,15 +396,29 @@ function CategoriesTab() {
 
   async function add() {
     const n = name.trim();
-    if (!n || n.length > 80) { toast.error("Nome inválido"); return; }
-    const { error } = await supabase.from("categories").insert({ name: n, slug: slugify(n) || crypto.randomUUID().slice(0, 8), sort_order: categories.length + 1 });
-    if (error) { toast.error(error.message); return; }
+    if (!n || n.length > 80) {
+      toast.error("Nome inválido");
+      return;
+    }
+    const { error } = await supabase.from("categories").insert({
+      name: n,
+      slug: slugify(n) || crypto.randomUUID().slice(0, 8),
+      sort_order: categories.length + 1,
+    });
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     setName("");
     refresh();
   }
+
   async function update(c: Category, patch: Partial<Category>) {
     const { error } = await supabase.from("categories").update(patch).eq("id", c.id);
-    if (error) { toast.error(error.message); return; }
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     refresh();
   }
 
@@ -290,13 +455,17 @@ function SettingsTab() {
   const [form, setForm] = useState({ store_name: "", whatsapp: "", address: "" });
   const [file, setFile] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
+
   useEffect(() => {
     if (data) setForm({ store_name: data.store_name, whatsapp: data.whatsapp, address: data.address });
   }, [data]);
 
   async function save() {
     const p = settingsSchema.safeParse({ ...form, whatsapp: form.whatsapp.replace(/\D/g, "") });
-    if (!p.success) { toast.error(p.error.issues[0]?.message ?? "Dados inválidos"); return; }
+    if (!p.success) {
+      toast.error(p.error.issues[0]?.message ?? "Dados inválidos");
+      return;
+    }
     setBusy(true);
     try {
       const logo_url = file ? await uploadImage(file) : (data?.logo_url ?? null);
@@ -314,19 +483,29 @@ function SettingsTab() {
 
   return (
     <div className="max-w-xl space-y-4 rounded-lg border bg-card p-5">
-      <div className="space-y-1"><Label>Nome da loja</Label><Input value={form.store_name} maxLength={100} onChange={(e) => setForm({ ...form, store_name: e.target.value })} /></div>
+      <div className="space-y-1">
+        <Label>Nome da loja</Label>
+        <Input value={form.store_name} maxLength={100} onChange={(e) => setForm({ ...form, store_name: e.target.value })} />
+      </div>
       <div className="space-y-1">
         <Label>WhatsApp oficial (com código do país e DDD)</Label>
         <Input value={form.whatsapp} inputMode="numeric" placeholder="5511999999999" onChange={(e) => setForm({ ...form, whatsapp: e.target.value.replace(/\D/g, "") })} />
         <p className="text-xs text-muted-foreground">Exemplo de formato: 55 + DDD + número, somente dígitos.</p>
       </div>
-      <div className="space-y-1"><Label>Endereço da loja</Label><Textarea value={form.address} maxLength={300} onChange={(e) => setForm({ ...form, address: e.target.value })} /></div>
+      <div className="space-y-1">
+        <Label>Endereço da loja</Label>
+        <Textarea value={form.address} maxLength={300} onChange={(e) => setForm({ ...form, address: e.target.value })} />
+      </div>
       <div className="space-y-1">
         <Label>Logotipo</Label>
-        {(file || data?.logo) && <img src={file ? URL.createObjectURL(file) : data?.logo ?? ""} alt="" className="h-16 w-16 rounded object-contain" />}
+        {(file || data?.logo) && (
+          <img src={file ? URL.createObjectURL(file) : data?.logo ?? ""} alt="" className="h-16 w-16 rounded object-contain" />
+        )}
         <Input type="file" accept="image/png,image/jpeg" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
       </div>
-      <Button variant="accent" onClick={save} disabled={busy}>{busy && <Loader2 className="animate-spin" />} Salvar configurações</Button>
+      <Button variant="accent" onClick={save} disabled={busy}>
+        {busy && <Loader2 className="animate-spin" />} Salvar configurações
+      </Button>
     </div>
   );
 }
@@ -337,53 +516,107 @@ function QuotesTab({ isAdmin }: { isAdmin: boolean }) {
   const { data: quotes = [], isLoading } = useQuery({
     queryKey: ["quotes"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("quotes").select("*, quote_items(*)").order("created_at", { ascending: false }).limit(500);
+      const { data, error } = await supabase.from("quotes")
+        .select("*, quote_items(*)")
+        .order("created_at", { ascending: false })
+        .limit(500);
       if (error) throw error;
       return data;
     },
   });
+
   const [sel, setSel] = useState<SavedQuote & { origin: string } | null>(null);
   const [q, setQ] = useState("");
   const { orcamento } = Route.useSearch();
   const nav = useNavigate();
+
   useEffect(() => {
     if (!orcamento) return;
     const x = quotes.find((y) => y.id === orcamento);
     if (!x) return;
-    setSel({ ...x, total: Number(x.total), items: x.quote_items.map((i) => ({ ...i, unit_price: Number(i.unit_price), quantity: Number(i.quantity), subtotal: Number(i.subtotal) })) });
+    setSel({
+      ...x,
+      total: Number(x.total),
+      items: x.quote_items.map((i) => ({
+        ...i,
+        unit_price: Number(i.unit_price),
+        quantity: Number(i.quantity),
+        subtotal: Number(i.subtotal),
+      })),
+    });
     nav({ to: "/admin", search: {}, replace: true });
   }, [orcamento, quotes, nav]);
+
   useEffect(() => {
     if (!sel) return;
-    supabase.rpc("record_quote_access", { _quote_id: sel.id, _action: "view" }).then(({ error }) => { if (error) toast.error("Não foi possível registrar a consulta."); });
+    supabase.rpc("record_quote_access", { _quote_id: sel.id, _action: "view" })
+      .then(({ error }) => {
+        if (error) toast.error("Não foi possível registrar a consulta.");
+      });
   }, [sel?.id]);
-  const history = useQuery({ queryKey: ["quote-access-history", sel?.id], enabled: isAdmin && !!sel, queryFn: async () => {
-    if (!sel) return [];
-    const result = await supabase.from("quote_access_events").select("*").eq("quote_id", sel.id).order("created_at", { ascending: false }).limit(20);
-    if (result.error) throw result.error; return result.data;
-  } });
+
+  const history = useQuery({
+    queryKey: ["quote-access-history", sel?.id],
+    enabled: isAdmin && !!sel,
+    queryFn: async () => {
+      if (!sel) return [];
+      const result = await supabase.from("quote_access_events")
+        .select("*")
+        .eq("quote_id", sel.id)
+        .order("created_at", { ascending: false })
+        .limit(20);
+      if (result.error) throw result.error;
+      return result.data;
+    },
+  });
+
   async function printQuote() {
     if (!sel) return;
     const preview = window.open("about:blank", "_blank");
-    if (!preview) { toast.error("Libere a abertura de janelas para imprimir o orçamento."); return; }
+    if (!preview) {
+      toast.error("Libere a abertura de janelas para imprimir o orçamento.");
+      return;
+    }
     const audit = await supabase.rpc("record_quote_access", { _quote_id: sel.id, _action: "print" });
-    if (audit.error) { preview.close(); toast.error("Não foi possível registrar a impressão."); return; }
+    if (audit.error) {
+      preview.close();
+      toast.error("Não foi possível registrar a impressão.");
+      return;
+    }
     await downloadQuotePdf(sel, settings, true, preview);
     history.refetch();
   }
-  const list = quotes.filter((x) => `${x.code} ${x.customer_name} ${x.customer_phone}`.toLowerCase().includes(q.toLowerCase()));
+
+  const list = quotes.filter((x) =>
+    `${x.code} ${x.customer_name} ${x.customer_phone}`.toLowerCase().includes(q.toLowerCase()),
+  );
 
   return (
     <div>
-      {isAdmin && <QuoteRetention />}
-      <Input className="mb-4 max-w-sm" placeholder="Buscar por número, cliente ou telefone" value={q} onChange={(e) => setQ(e.target.value)} />
-      {isLoading ? <Loader2 className="animate-spin" /> : list.length === 0 ? (
+      <Input
+        className="mb-4 max-w-sm"
+        placeholder="Buscar por número, cliente ou telefone"
+        value={q}
+        onChange={(e) => setQ(e.target.value)}
+      />
+
+      {isLoading ? (
+        <Loader2 className="animate-spin" />
+      ) : list.length === 0 ? (
         <p className="text-muted-foreground">Nenhum orçamento recebido ainda.</p>
       ) : (
         <div className="overflow-x-auto rounded-lg border bg-card">
           <table className="w-full text-sm">
             <thead className="bg-muted text-left text-xs uppercase text-muted-foreground">
-              <tr><th className="p-3">Número</th><th className="p-3">Data</th><th className="p-3">Cliente</th><th className="p-3">Telefone</th><th className="p-3">Origem</th><th className="p-3 text-right">Total</th><th className="p-3" /></tr>
+              <tr>
+                <th className="p-3">Número</th>
+                <th className="p-3">Data</th>
+                <th className="p-3">Cliente</th>
+                <th className="p-3">Telefone</th>
+                <th className="p-3">Origem</th>
+                <th className="p-3 text-right">Total</th>
+                <th className="p-3" />
+              </tr>
             </thead>
             <tbody>
               {list.map((x) => (
@@ -392,10 +625,25 @@ function QuotesTab({ isAdmin }: { isAdmin: boolean }) {
                   <td className="p-3 whitespace-nowrap">{formatDateTime(x.created_at)}</td>
                   <td className="p-3">{x.customer_name}</td>
                   <td className="p-3 whitespace-nowrap">{formatPhone(x.customer_phone)}</td>
-                  <td className="p-3"><span className="rounded bg-accent/20 px-2 py-0.5 text-xs font-semibold">{x.origin}</span></td>
+                  <td className="p-3">
+                    <span className="rounded bg-accent/20 px-2 py-0.5 text-xs font-semibold">{x.origin}</span>
+                  </td>
                   <td className="p-3 text-right font-semibold">{formatBRL(Number(x.total))}</td>
                   <td className="p-3">
-                    <Button size="sm" variant="outline" onClick={() => setSel({ ...x, total: Number(x.total), items: x.quote_items.map((i) => ({ ...i, unit_price: Number(i.unit_price), quantity: Number(i.quantity), subtotal: Number(i.subtotal) })) })}>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setSel({
+                        ...x,
+                        total: Number(x.total),
+                        items: x.quote_items.map((i) => ({
+                          ...i,
+                          unit_price: Number(i.unit_price),
+                          quantity: Number(i.quantity),
+                          subtotal: Number(i.subtotal),
+                        })),
+                      })}
+                    >
                       <Eye /> Ver
                     </Button>
                   </td>
@@ -405,9 +653,12 @@ function QuotesTab({ isAdmin }: { isAdmin: boolean }) {
           </table>
         </div>
       )}
+
       <Dialog open={!!sel} onOpenChange={(o) => !o && setSel(null)}>
         <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
-          <DialogHeader><DialogTitle>Orçamento {sel?.code}</DialogTitle></DialogHeader>
+          <DialogHeader>
+            <DialogTitle>Orçamento {sel?.code}</DialogTitle>
+          </DialogHeader>
           {sel && (
             <div className="text-sm">
               <p><b>Data:</b> {formatDateTime(sel.created_at)}</p>
@@ -416,15 +667,30 @@ function QuotesTab({ isAdmin }: { isAdmin: boolean }) {
               {sel.delivery_address && <p><b>Entrega:</b> {sel.delivery_address}</p>}
               <p><b>Origem:</b> {sel.origin}</p>
               <QuoteTable items={sel.items} total={sel.total} />
-              <p className="mt-3 text-xs text-muted-foreground">Preços registrados no momento do orçamento. {DISCLAIMER}</p>
+              <p className="mt-3 text-xs text-muted-foreground">
+                Preços registrados no momento do orçamento. {DISCLAIMER}
+              </p>
               <div className="mt-4 flex flex-wrap gap-2">
                 <Button onClick={() => downloadQuotePdf(sel, settings)}>Baixar PDF</Button>
                 <Button onClick={printQuote}><Printer /> Imprimir orçamento</Button>
-                {isAdmin && <Button asChild variant="whatsapp">
-                  <a href={`https://wa.me/55${sel.customer_phone.replace(/^55/, "")}`} target="_blank" rel="noopener noreferrer">Chamar cliente no WhatsApp</a>
-                </Button>}
+                {isAdmin && (
+                  <Button asChild variant="whatsapp">
+                    <a href={`https://wa.me/55${sel.customer_phone.replace(/^55/, "")}`} target="_blank" rel="noopener noreferrer">
+                      Chamar cliente no WhatsApp
+                    </a>
+                  </Button>
+                )}
               </div>
-              {isAdmin && <div className="mt-5 border-t pt-3"><h3 className="font-semibold">Histórico de consultas e impressão</h3>{history.data?.map(e => <p key={e.id} className="mt-1 text-xs text-muted-foreground">{e.user_name || "Usuário"} · {e.action === "print" ? "Impressão solicitada" : "Visualizou"} · {formatDateTime(e.created_at)}</p>)}</div>}
+              {isAdmin && (
+                <div className="mt-5 border-t pt-3">
+                  <h3 className="font-semibold">Histórico de consultas e impressão</h3>
+                  {history.data?.map((e) => (
+                    <p key={e.id} className="mt-1 text-xs text-muted-foreground">
+                      {e.user_name || "Usuário"} · {e.action === "print" ? "Impressão solicitada" : "Visualizou"} · {formatDateTime(e.created_at)}
+                    </p>
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </DialogContent>
