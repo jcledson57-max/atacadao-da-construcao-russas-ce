@@ -73,10 +73,10 @@ function AdminPage() {
     <div className="min-h-screen bg-background">
       <header className="border-b bg-card">
         <div className="hazard-stripe h-1.5" />
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
+        <div className="mx-auto flex min-h-16 max-w-6xl flex-wrap items-center justify-between gap-2 px-4 py-3">
           <Brand />
           <div className="flex items-center gap-2">
-            <span className="hidden text-sm text-muted-foreground sm:inline">{role.data?.name} · {roleLabel(role.data?.role ?? null)}</span>
+            <span className="max-w-full break-words text-sm text-muted-foreground">{role.data?.name} · {roleLabel(role.data?.role ?? null)}</span>
             {role.data?.manage && <NotificationBell userId={role.data.userId} />}
             <Button variant="outline" size="sm" onClick={signOut}><LogOut /> Sair</Button>
           </div>
@@ -364,9 +364,11 @@ function QuotesTab({ isAdmin }: { isAdmin: boolean }) {
   } });
   async function printQuote() {
     if (!sel) return;
+    const preview = window.open("about:blank", "_blank");
+    if (!preview) { toast.error("Libere a abertura de janelas para imprimir o orçamento."); return; }
     const audit = await supabase.rpc("record_quote_access", { _quote_id: sel.id, _action: "print" });
-    if (audit.error) { toast.error("Não foi possível registrar a impressão."); return; }
-    await downloadQuotePdf(sel, settings, true);
+    if (audit.error) { preview.close(); toast.error("Não foi possível registrar a impressão."); return; }
+    await downloadQuotePdf(sel, settings, true, preview);
     history.refetch();
   }
   const list = quotes.filter((x) => `${x.code} ${x.customer_name} ${x.customer_phone}`.toLowerCase().includes(q.toLowerCase()));
