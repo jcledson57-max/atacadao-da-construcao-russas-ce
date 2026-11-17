@@ -1,3 +1,4 @@
+
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import { formatBRL, formatDateTime, formatPhone, formatQty } from "./format";
@@ -36,12 +37,16 @@ async function toDataUrl(url: string): Promise<{ data: string; fmt: string } | n
 export async function downloadQuotePdf(q: SavedQuote, s: StoreSettings | undefined, print = false, preview?: Window) {
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const W = doc.internal.pageSize.getWidth();
+
+  // Cabeçalho com altura ampliada para evitar sobreposição
   doc.setFillColor(28, 42, 74);
-  doc.rect(0, 0, W, 32, "F");
+  doc.rect(0, 0, W, 40, "F");
+
   doc.setFillColor(242, 133, 30);
-  doc.rect(0, 32, W, 2, "F");
+  doc.rect(0, 40, W, 2, "F");
 
   let x = 14;
+
   if (s?.logo) {
     const img = await toDataUrl(s.logo);
     if (img) {
@@ -49,36 +54,78 @@ export async function downloadQuotePdf(q: SavedQuote, s: StoreSettings | undefin
       x = 38;
     }
   }
+
   doc.setTextColor(255, 255, 255);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(16);
   doc.text(s?.store_name || "Orçamento", x, 15);
+
   doc.setFont("helvetica", "normal");
   doc.setFontSize(9);
-  if (s?.address) doc.text(s.address, x, 21, { maxWidth: W - x - 70 });
-  if (s?.whatsapp) doc.text(`WhatsApp: ${formatPhone(s.whatsapp.replace(/^55/, ""))}`, x, 26);
+
+  // Endereço com quebra automática de linha
+  const addressLines = s?.address
+    ? doc.splitTextToSize(s.address, W - x - 70)
+    : [];
+
+  if (addressLines.length > 0) {
+    doc.text(addressLines, x, 21, {
+      lineHeightFactor: 1,
+    });
+  }
+
+  // WhatsApp posicionado automaticamente abaixo do endereço
+  const whatsappY = addressLines.length > 0
+    ? 21 + addressLines.length * 4 + 1
+    : 26;
+
+  if (s?.whatsapp) {
+    doc.text(
+      `WhatsApp: ${formatPhone(s.whatsapp.replace(/^55/, ""))}`,
+      x,
+      whatsappY
+    );
+  }
+
+  // Informações do orçamento à direita
   doc.setFont("helvetica", "bold");
   doc.setFontSize(11);
-  doc.text(`ORÇAMENTO Nº ${q.code}`, W - 14, 15, { align: "right" });
+  doc.text(`ORÇAMENTO Nº ${q.code}`, W - 14, 15, {
+    align: "right",
+  });
+
   doc.setFont("helvetica", "normal");
   doc.setFontSize(9);
-  doc.text(formatDateTime(q.created_at), W - 14, 21, { align: "right" });
-  doc.text("Origem: CATÁLOGO ONLINE", W - 14, 26, { align: "right" });
+  doc.text(formatDateTime(q.created_at), W - 14, 21, {
+    align: "right",
+  });
+  doc.text("Origem: CATÁLOGO ONLINE", W - 14, 26, {
+    align: "right",
+  });
 
+  // Dados do cliente
   doc.setTextColor(30, 30, 30);
   doc.setFontSize(10);
-  let y = 44;
+
+  let y = 50;
+
   doc.setFont("helvetica", "bold");
   doc.text("Cliente", 14, y);
+
   doc.setFont("helvetica", "normal");
   doc.text(`Nome: ${q.customer_name}`, 14, (y += 6));
   doc.text(`Telefone: ${formatPhone(q.customer_phone)}`, 14, (y += 5));
+
   if (q.delivery_address) {
-    const lines = doc.splitTextToSize(`Endereço de entrega: ${q.delivery_address}`, W - 28);
+    const lines = doc.splitTextToSize(
+      `Endereço de entrega: ${q.delivery_address}`,
+      W - 28
+    );
     doc.text(lines, 14, (y += 5));
     y += (lines.length - 1) * 5;
   }
 
+  // Tabela de produtos
   autoTable(doc, {
     startY: y + 6,
     head: [["Produto", "Qtd.", "Unidade", "Preço unit.", "Subtotal"]],
@@ -90,23 +137,47 @@ export async function downloadQuotePdf(q: SavedQuote, s: StoreSettings | undefin
       formatBRL(Number(i.subtotal)),
     ]),
     foot: [["", "", "", "TOTAL", formatBRL(Number(q.total))]],
-    headStyles: { fillColor: [28, 42, 74] },
-    footStyles: { fillColor: [242, 133, 30], textColor: [20, 20, 20], fontStyle: "bold" },
-    columnStyles: { 1: { halign: "right" }, 3: { halign: "right" }, 4: { halign: "right" } },
-    styles: { fontSize: 9 },
+    headStyles: {
+      fillColor: [28, 42, 74],
+    },
+    footStyles: {
+      fillColor: [242, 133, 30],
+      textColor: [20, 20, 20],
+      fontStyle: "bold",
+    },
+    columnStyles: {
+      1: { halign: "right" },
+      3: { halign: "right" },
+      4: { halign: "right" },
+    },
+    styles: {
+      fontSize: 9,
+    },
   });
+
+  // Observação final
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const endY = (doc as any).lastAutoTable.finalY + 10;
+
   doc.setFontSize(8.5);
   doc.setTextColor(90, 90, 90);
   doc.text(doc.splitTextToSize(DISCLAIMER, W - 28), 14, endY);
+
+  // Impressão ou download
   if (print) {
     doc.autoPrint();
     const url = URL.createObjectURL(doc.output("blob"));
-    if (preview) preview.location.href = url;
-    else window.open(url, "_blank");
+
+    if (preview) {
+      preview.location.href = url;
+    } else {
+      window.open(url, "_blank");
+    }
+
     setTimeout(() => URL.revokeObjectURL(url), 60000);
-  } else doc.save(`orcamento-${q.code}.pdf`);
+  } else {
+    doc.save(`orcamento-${q.code}.pdf`);
+  }
 }
 
 export function whatsappMessage(q: SavedQuote) {
@@ -123,8 +194,16 @@ export function whatsappMessage(q: SavedQuote) {
     "",
     `*Total: ${formatBRL(Number(q.total))}*`,
   ];
-  if (q.delivery_address) lines.push(`Entrega: ${q.delivery_address}`);
-  lines.push("", "Aguardo confirmação de disponibilidade e condições de entrega.");
+
+  if (q.delivery_address) {
+    lines.push(`Entrega: ${q.delivery_address}`);
+  }
+
+  lines.push(
+    "",
+    "Aguardo confirmação de disponibilidade e condições de entrega."
+  );
+
   return lines.join("\n");
 }
 
