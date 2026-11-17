@@ -12,7 +12,13 @@ export type SavedQuote = {
   customer_name: string;
   customer_phone: string;
   delivery_address: string | null;
-  items: { product_name: string; unit: string; unit_price: number; quantity: number; subtotal: number }[];
+  items: {
+    product_name: string;
+    unit: string;
+    unit_price: number;
+    quantity: number;
+    subtotal: number;
+  }[];
 };
 
 export const DISCLAIMER =
@@ -22,23 +28,30 @@ async function toDataUrl(url: string): Promise<{ data: string; fmt: string } | n
   try {
     const blob = await (await fetch(url)).blob();
     const fmt = blob.type.includes("png") ? "PNG" : "JPEG";
+
     const data = await new Promise<string>((res, rej) => {
       const r = new FileReader();
       r.onload = () => res(r.result as string);
       r.onerror = rej;
       r.readAsDataURL(blob);
     });
+
     return { data, fmt };
   } catch {
     return null;
   }
 }
 
-export async function downloadQuotePdf(q: SavedQuote, s: StoreSettings | undefined, print = false, preview?: Window) {
+export async function downloadQuotePdf(
+  q: SavedQuote,
+  s: StoreSettings | undefined,
+  print = false,
+  preview?: Window
+) {
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const W = doc.internal.pageSize.getWidth();
 
-  // Cabeçalho com altura ampliada para evitar sobreposição
+  // Cabeçalho
   doc.setFillColor(28, 42, 74);
   doc.rect(0, 0, W, 40, "F");
 
@@ -49,6 +62,7 @@ export async function downloadQuotePdf(q: SavedQuote, s: StoreSettings | undefin
 
   if (s?.logo) {
     const img = await toDataUrl(s.logo);
+
     if (img) {
       doc.addImage(img.data, img.fmt, 14, 6, 20, 20);
       x = 38;
@@ -63,7 +77,6 @@ export async function downloadQuotePdf(q: SavedQuote, s: StoreSettings | undefin
   doc.setFont("helvetica", "normal");
   doc.setFontSize(9);
 
-  // Endereço com quebra automática de linha
   const addressLines = s?.address
     ? doc.splitTextToSize(s.address, W - x - 70)
     : [];
@@ -74,10 +87,10 @@ export async function downloadQuotePdf(q: SavedQuote, s: StoreSettings | undefin
     });
   }
 
-  // WhatsApp posicionado automaticamente abaixo do endereço
-  const whatsappY = addressLines.length > 0
-    ? 21 + addressLines.length * 4 + 1
-    : 26;
+  const whatsappY =
+    addressLines.length > 0
+      ? 21 + addressLines.length * 4 + 1
+      : 26;
 
   if (s?.whatsapp) {
     doc.text(
@@ -87,7 +100,7 @@ export async function downloadQuotePdf(q: SavedQuote, s: StoreSettings | undefin
     );
   }
 
-  // Informações do orçamento à direita
+  // Informações do orçamento
   doc.setFont("helvetica", "bold");
   doc.setFontSize(11);
   doc.text(`ORÇAMENTO Nº ${q.code}`, W - 14, 15, {
@@ -121,14 +134,30 @@ export async function downloadQuotePdf(q: SavedQuote, s: StoreSettings | undefin
       `Endereço de entrega: ${q.delivery_address}`,
       W - 28
     );
+
     doc.text(lines, 14, (y += 5));
     y += (lines.length - 1) * 5;
   }
 
-  // Tabela de produtos
+  // Tabela de produtos com colunas alinhadas
   autoTable(doc, {
     startY: y + 6,
-    head: [["Produto", "Qtd.", "Unidade", "Preço unit.", "Subtotal"]],
+
+    margin: {
+      left: 14,
+      right: 14,
+    },
+
+    tableWidth: 182,
+
+    head: [[
+      "Produto",
+      "Qtd.",
+      "Unidade",
+      "Preço unit.",
+      "Subtotal",
+    ]],
+
     body: q.items.map((i) => [
       i.product_name,
       formatQty(Number(i.quantity)),
@@ -136,22 +165,74 @@ export async function downloadQuotePdf(q: SavedQuote, s: StoreSettings | undefin
       formatBRL(Number(i.unit_price)),
       formatBRL(Number(i.subtotal)),
     ]),
-    foot: [["", "", "", "TOTAL", formatBRL(Number(q.total))]],
+
+    foot: [[
+      "",
+      "",
+      "",
+      "TOTAL",
+      formatBRL(Number(q.total)),
+    ]],
+
+    styles: {
+      font: "helvetica",
+      fontSize: 9,
+      cellPadding: 3,
+      overflow: "linebreak",
+      valign: "middle",
+      lineColor: [210, 210, 210],
+      lineWidth: 0.2,
+      textColor: [30, 30, 30],
+    },
+
     headStyles: {
       fillColor: [28, 42, 74],
+      textColor: [255, 255, 255],
+      fontStyle: "bold",
+      halign: "center",
+      valign: "middle",
     },
+
+    bodyStyles: {
+      minCellHeight: 9,
+    },
+
     footStyles: {
       fillColor: [242, 133, 30],
       textColor: [20, 20, 20],
       fontStyle: "bold",
+      minCellHeight: 10,
+      halign: "right",
     },
+
     columnStyles: {
-      1: { halign: "right" },
-      3: { halign: "right" },
-      4: { halign: "right" },
+      0: {
+        cellWidth: 76,
+        halign: "left",
+      },
+      1: {
+        cellWidth: 16,
+        halign: "center",
+      },
+      2: {
+        cellWidth: 22,
+        halign: "center",
+      },
+      3: {
+        cellWidth: 34,
+        halign: "right",
+      },
+      4: {
+        cellWidth: 34,
+        halign: "right",
+      },
     },
-    styles: {
-      fontSize: 9,
+
+    didParseCell: (data) => {
+      if (data.section === "foot" && data.column.index === 3) {
+        data.cell.styles.halign = "right";
+        data.cell.styles.fontStyle = "bold";
+      }
     },
   });
 
@@ -161,11 +242,17 @@ export async function downloadQuotePdf(q: SavedQuote, s: StoreSettings | undefin
 
   doc.setFontSize(8.5);
   doc.setTextColor(90, 90, 90);
-  doc.text(doc.splitTextToSize(DISCLAIMER, W - 28), 14, endY);
+
+  doc.text(
+    doc.splitTextToSize(DISCLAIMER, W - 28),
+    14,
+    endY
+  );
 
   // Impressão ou download
   if (print) {
     doc.autoPrint();
+
     const url = URL.createObjectURL(doc.output("blob"));
 
     if (preview) {
@@ -189,7 +276,7 @@ export function whatsappMessage(q: SavedQuote) {
     "",
     ...q.items.map(
       (i) =>
-        `• ${formatQty(Number(i.quantity))} ${i.unit} - ${i.product_name} (${formatBRL(Number(i.unit_price))}) = ${formatBRL(Number(i.subtotal))}`,
+        `• ${formatQty(Number(i.quantity))} ${i.unit} - ${i.product_name} (${formatBRL(Number(i.unit_price))}) = ${formatBRL(Number(i.subtotal))}`
     ),
     "",
     `*Total: ${formatBRL(Number(q.total))}*`,
