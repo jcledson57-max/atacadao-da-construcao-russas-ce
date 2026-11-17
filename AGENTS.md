@@ -12,7 +12,7 @@
 ## Project rules
 - Quotes are created only via the `create_quote` SECURITY DEFINER RPC, which reads prices from `products` and snapshots them into `quote_items`; never trust client prices.
 - Team roles live only in `user_roles`; `has_role` also checks profile blocked/deleted state so old tokens cannot bypass revocation. Signup creates profiles but never assigns privileges after initial bootstrap.
-- Store images live in the private `store-images` bucket (public buckets are blocked); DB stores `storage:<path>` and the client resolves signed URLs in `src/lib/store.ts`.
+- Store images live in the private `store-images` bucket; DB stores `storage:<path>` and the client resolves signed URLs in `src/lib/store.ts`. Visitors can read only active-product images and the current logo; active admins can preview all images, preventing access to unpublished/orphaned uploads.
 - PDF generation is client-side (jspdf + jspdf-autotable) in `src/lib/quote-output.ts`, so it works on any device without server runtime constraints.
 - GitHub Pages build is opt-in via `GITHUB_PAGES=true` (static SPA, base from `PAGES_BASE`, output `dist/client`); default build stays the Lovable/Cloudflare one so preview and publish are unaffected.
 - Site-relative image paths go through `withBase()` in `src/lib/store.ts` so they work under a subfolder base path.
