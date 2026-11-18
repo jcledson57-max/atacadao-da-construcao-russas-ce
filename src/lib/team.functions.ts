@@ -1,6 +1,7 @@
 import { createServerFn } from '@tanstack/react-start';
 import { z } from 'zod';
 import { requireSupabaseAuth } from '@/integrations/supabase/auth-middleware';
+import { teamRpc } from './team-rpc';
 
 export const accountSchema = z.object({
   id: z.string().uuid().optional(), name: z.string().trim().min(2).max(120),
@@ -8,7 +9,7 @@ export const accountSchema = z.object({
   role: z.enum(['admin', 'attendant']), blocked: z.boolean(),
 });
 
-export const listTeam = createServerFn({ method: 'POST' }).middleware([requireSupabaseAuth]).handler(async ({ context }) => {
+export const listTeam = createServerFn({ method: 'POST' }).middleware([teamRpc, requireSupabaseAuth]).handler(async ({ context }) => {
   const permission = await context.supabase.rpc('has_role', { _user_id: context.userId, _role: 'admin' });
   if (permission.error || !permission.data) throw new Error('Acesso exclusivo do administrador.');
   const { supabaseAdmin } = await import('@/integrations/supabase/client.server');
@@ -26,7 +27,7 @@ export const listTeam = createServerFn({ method: 'POST' }).middleware([requireSu
   }));
 });
 
-export const saveTeamAccount = createServerFn({ method: 'POST' }).middleware([requireSupabaseAuth])
+export const saveTeamAccount = createServerFn({ method: 'POST' }).middleware([teamRpc, requireSupabaseAuth])
   .inputValidator((input: unknown) => accountSchema.parse(input)).handler(async ({ data, context }) => {
     const permission = await context.supabase.rpc('has_role', { _user_id: context.userId, _role: 'admin' });
     if (permission.error || !permission.data) throw new Error('Acesso exclusivo do administrador.');
@@ -48,7 +49,7 @@ export const saveTeamAccount = createServerFn({ method: 'POST' }).middleware([re
     return { id };
   });
 
-export const deleteTeamAccount = createServerFn({ method: 'POST' }).middleware([requireSupabaseAuth])
+export const deleteTeamAccount = createServerFn({ method: 'POST' }).middleware([teamRpc, requireSupabaseAuth])
   .inputValidator((input: unknown) => z.object({ id: z.string().uuid(), confirmed: z.literal(true) }).parse(input))
   .handler(async ({ data, context }) => {
     const permission = await context.supabase.rpc('has_role', { _user_id: context.userId, _role: 'admin' });
