@@ -1,7 +1,7 @@
 import { createFileRoute, redirect } from '@tanstack/react-router';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useServerFn } from '@tanstack/react-start';
-import { Loader2, Pencil, Plus, Shield, Trash2, LockKeyhole, UnlockKeyhole } from 'lucide-react';
+import { Loader2, Pencil, Plus, Shield, Trash2, LockKeyhole, UnlockKeyhole, ExternalLink } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -12,6 +12,7 @@ import { TeamHeader, TeamNavigation } from '@/components/site/TeamHeader';
 import { currentTeamAccess, teamAccessQuery, roleLabel, canRemoveAdministrator, type TeamRole } from '@/lib/team-access';
 import { listTeam, saveTeamAccount, deleteTeamAccount } from '@/lib/team.functions';
 import { formatDateTime } from '@/lib/format';
+import { HOSTED_USERS_URL, teamManagementAvailable } from '@/lib/team-hosting';
 
 export const Route = createFileRoute('/_authenticated/usuarios')({
   beforeLoad: async () => { const access = await currentTeamAccess(); if (!access.manage) throw redirect({ to: '/admin' }); },
@@ -28,7 +29,7 @@ type Draft = { id?: string; name: string; email: string; password: string; role:
 function UsersPage() {
   const qc = useQueryClient(); const access = useQuery(teamAccessQuery);
   const fetchTeam = useServerFn(listTeam); const save = useServerFn(saveTeamAccount); const remove = useServerFn(deleteTeamAccount);
-  const users = useQuery({ queryKey: ['team-users'], queryFn: () => fetchTeam(), enabled: !!access.data?.manage });
+  const users = useQuery({ queryKey: ['team-users'], queryFn: () => fetchTeam(), enabled: !!access.data?.manage && teamManagementAvailable });
   const [draft, setDraft] = useState<Draft | null>(null); const [deleting, setDeleting] = useState<{ id: string; name: string } | null>(null);
   const [busy, setBusy] = useState(false); const [search, setSearch] = useState('');
   const activeAdmins = users.data?.filter(u => u.role === 'admin' && !u.blocked).length ?? 0;
@@ -48,6 +49,7 @@ function UsersPage() {
     try { await remove({ data: { id: deleting.id, confirmed: true } }); setDeleting(null); toast.success('Usuário excluído e acesso revogado.'); await refresh(); }
     catch (e) { toast.error((e as Error).message); } finally { setBusy(false); }
   }
+  if (!teamManagementAvailable) return <div className="min-h-screen bg-background"><TeamHeader name={access.data?.name} role={access.data?.role} /><main className="mx-auto max-w-6xl space-y-6 px-4 py-8"><TeamNavigation /><h1 className="text-3xl font-extrabold uppercase text-primary">Usuários e Permissões</h1><div role="status" className="space-y-3 border-l-4 border-accent bg-accent/10 p-4"><p className="font-semibold">O cadastro de usuários está disponível no painel do Lovable.</p><p className="text-sm text-muted-foreground">O GitHub Pages não permite cadastrar, editar ou bloquear contas. Abra o painel seguro e entre com seu e-mail e senha de administrador.</p></div><Button asChild variant="accent"><a href={HOSTED_USERS_URL} target="_blank" rel="noopener noreferrer"><ExternalLink /> Abrir gestão de usuários</a></Button></main></div>;
   return <div className="min-h-screen bg-background"><TeamHeader name={access.data?.name} role={access.data?.role} /><main className="mx-auto max-w-6xl space-y-6 px-4 py-8">
     {access.data?.manage ? <><TeamNavigation /><div className="flex flex-wrap items-center justify-between gap-4"><div><h1 className="text-3xl font-extrabold uppercase text-primary">Usuários e Permissões</h1><p className="text-sm text-muted-foreground">{users.data?.length ?? 0} usuários cadastrados</p></div><Button variant="accent" onClick={() => setDraft({ name: '', email: '', password: '', role: 'attendant', blocked: false })}><Plus /> Novo usuário</Button></div>
     <Input className="max-w-sm" placeholder="Buscar nome ou e-mail" value={search} onChange={e => setSearch(e.target.value)} aria-label="Buscar usuários" />

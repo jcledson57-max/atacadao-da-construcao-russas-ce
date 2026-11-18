@@ -14,7 +14,7 @@ const pagesBase = process.env["PAGES_BASE"] || "/atacadao-da-construcao-russas-c
 export default defineConfig(
   isPages
     ? {
-        vite: { base: pagesBase },
+        vite: { base: pagesBase, define: { 'import.meta.env.VITE_STATIC_HOSTING': JSON.stringify('true') } },
         nitro: false,
         tanstackStart: {
           server: { entry: "server" },

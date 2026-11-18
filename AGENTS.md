@@ -21,3 +21,4 @@
 - Deleted team accounts are archived and banned rather than physically removed so quote access audit identities remain intact. Quote consultation/print requests append to `quote_access_events` through an authorized RPC.
 - `/usuarios` has an admin-only gate; the existing `/admin` surface renders quote-only controls for attendants. Privileged account functions require the hosted TanStack runtime, not the optional static GitHub Pages build.
 - Team RPC validates transport responses before TanStack decoding and never retries mutations automatically, preventing opaque invariant errors and accidental duplicate account creation.
+- Static builds explicitly disable team RPCs and link to the hosted users page without transferring credentials, because GitHub Pages cannot execute privileged account operations.
